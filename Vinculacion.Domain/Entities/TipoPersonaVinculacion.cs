@@ -1,9 +1,10 @@
 ﻿
+
 namespace Vinculacion.Domain.Entities
 {
-    public class Facultades
+    public class TipoPersonaVinculacion
     {
-        public decimal FacultadID { get; set; }
+        public decimal TipoPersonaID { get; set; }
 
         public string Descripcion { get; set; }
     }
