@@ -10,7 +10,6 @@
     <Folder Include="Features\ActividadVinculacion\Commands\" />
     <Folder Include="Features\ActividadVinculacion\Dtos\" />
     <Folder Include="Features\ActividadVinculacion\Handlers\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

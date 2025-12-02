@@ -1,8 +1,8 @@
 ﻿
 using MediatR;
-using Vinculacion.Application.Features.ActorExterno.Dtos;
+using Vinculacion.Application.Features.ActorVinculacion.Dtos;
 
-namespace Vinculacion.Application.Features.ActorExterno.Commands
+namespace Vinculacion.Application.Features.ActorVinculacion.Commands
 {
     public class CreateActorExternoCommand: IRequest<int>
     {

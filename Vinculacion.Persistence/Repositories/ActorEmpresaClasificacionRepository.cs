@@ -5,9 +5,9 @@ using Vinculacion.Persistence.Context;
 
 namespace Vinculacion.Persistence.Repositories
 {
-    public class ActorEmpresaRepository : BaseRepository<ActorEmpresa>, IActorEmpresaRepository
+    public class ActorEmpresaClasificacionRepository : BaseRepository<ActorEmpresaClasificacion>, IActorEmpresaClasificacion
     {
-        public ActorEmpresaRepository(VinculacionContext context) : base(context)
+        public ActorEmpresaClasificacionRepository(VinculacionContext context) : base(context)
         {
         }
     }

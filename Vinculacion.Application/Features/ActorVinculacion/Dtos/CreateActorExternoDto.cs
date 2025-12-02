@@ -1,4 +1,4 @@
-﻿namespace Vinculacion.Application.Features.ActorExterno.Dtos
+﻿namespace Vinculacion.Application.Features.ActorVinculacion.Dtos
 {
     public class CreateActorExternoDto
     {
@@ -13,11 +13,12 @@
         public decimal? Sexo { get; set; }
         public decimal? PaisID { get; set; }
 
-
         public string NombreEmpresa { get; set; }
         public string ContactoNombrePersona { get; set; }
         public string ContactoCorreo { get; set; }
         public string ContactoTelefono { get; set; }
         public decimal? ContactoSexoPersona { get; set; }
+
+        public List<decimal> Clasificaciones { get; set; }
     }
 }

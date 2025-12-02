@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Vinculacion.API\Vinculacion.API.csproj" />
     <ProjectReference Include="..\Vinculacion.Application\Vinculacion.Application.csproj" />
     <ProjectReference Include="..\Vinculacion.Domain\Vinculacion.Domain.csproj" />
   </ItemGroup>

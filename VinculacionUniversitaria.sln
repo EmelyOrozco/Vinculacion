@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CORE", "CORE", "{02EA681E-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{573AB160-8EEC-4854-B0AD-0C2998E936B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infraestructura", "Infraestructura", "{37C390AE-51F2-4A64-9B33-D4F8258F2263}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{37C390AE-51F2-4A64-9B33-D4F8258F2263}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinculacion.Application", "Vinculacion.Application\Vinculacion.Application.csproj", "{F53048CB-77F6-4310-A96E-C71C3EF64479}"
 EndProject
