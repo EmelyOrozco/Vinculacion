@@ -12,7 +12,7 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<ActorExterno> ActorExterno { get; set; }
 
-        public DbSet<Paises> Paises { get; set; }
+        public DbSet<Pais> Pais { get; set; }
 
         public DbSet<ActorPersona> ActorPersona { get; set; }
 

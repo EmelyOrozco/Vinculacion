@@ -1,15 +1,22 @@
+using Microsoft.EntityFrameworkCore; 
+using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Infrastructure.Persistence; 
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<VinculacionContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("VinculacionDatabase"))
+);
+
+builder.Services.AddScoped<IActorEmpresaRepository, ActorEmpresaRepository>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

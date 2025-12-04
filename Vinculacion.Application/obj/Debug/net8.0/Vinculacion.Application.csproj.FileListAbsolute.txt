@@ -1,0 +1,16 @@
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\bin\Debug\net8.0\Vinculacion.Application.deps.json
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\bin\Debug\net8.0\Vinculacion.Application.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\bin\Debug\net8.0\Vinculacion.Application.pdb
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\bin\Debug\net8.0\Vinculacion.Domain.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\bin\Debug\net8.0\Vinculacion.Domain.pdb
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.csproj.AssemblyReference.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.AssemblyInfoInputs.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.AssemblyInfo.cs
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.csproj.CoreCompileInputs.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.sourcelink.json
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculac.F61D7BA9.Up2Date
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\refint\Vinculacion.Application.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\Vinculacion.Application.pdb
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Application\obj\Debug\net8.0\ref\Vinculacion.Application.dll

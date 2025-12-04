@@ -1,0 +1,18 @@
+[
+  {
+    "ContainingType": "Vinculacion.API.Controllers.ActorPersonaController",
+    "Method": "Create",
+    "RelativePath": "api/ActorPersona",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "command",
+        "Type": "Vinculacion.Application.Features.ActorVinculacion.Commands.CreateActorPersonaCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

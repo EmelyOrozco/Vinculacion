@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Vinculacion.API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/ActorPersona": {
+      "post": {
+        "tags": [
+          "ActorPersona"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActorPersonaCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActorPersonaCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActorPersonaCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateActorPersonaCommand": {
+        "required": [
+          "actorPersona"
+        ],
+        "type": "object",
+        "properties": {
+          "actorPersona": {
+            "$ref": "#/components/schemas/CreateActorPersonaDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateActorPersonaDto": {
+        "type": "object",
+        "properties": {
+          "nombreCompleto": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoIdentificacion": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "identificacionNumero": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "sexo": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "paisID": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

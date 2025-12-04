@@ -63,7 +63,7 @@ namespace Vinculacion.Persistence.Base
             }
         }
 
-        public virtual OperationResult<TEntity> Update(TEntity entity)
+        public virtual async Task<OperationResult<TEntity>> Update(TEntity entity)
         {
 
             _context.Entry(entity).State = EntityState.Modified;
@@ -71,11 +71,6 @@ namespace Vinculacion.Persistence.Base
             return OperationResult<TEntity>.Success($"{typeof(TEntity)} actualizada correctamente", entity);
 
         }
-
-        //public virtual async Task<int> DeleteAsync(int id)
-        //{
-
-        //}
 
     }
 }

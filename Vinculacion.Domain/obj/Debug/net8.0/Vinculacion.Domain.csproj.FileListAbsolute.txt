@@ -1,0 +1,13 @@
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\bin\Debug\net8.0\Vinculacion.Domain.deps.json
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\bin\Debug\net8.0\Vinculacion.Domain.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\bin\Debug\net8.0\Vinculacion.Domain.pdb
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.csproj.AssemblyReference.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.AssemblyInfoInputs.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.AssemblyInfo.cs
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.csproj.CoreCompileInputs.cache
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.sourcelink.json
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\refint\Vinculacion.Domain.dll
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\Vinculacion.Domain.pdb
+C:\Users\empao\OneDrive\Desktop\Tesis\VinculacionUniversitaria\Vinculacion.Domain\obj\Debug\net8.0\ref\Vinculacion.Domain.dll

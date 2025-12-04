@@ -1,10 +1,11 @@
-﻿using Vinculacion.Application.Features.ActorVinculacion.Commands;
+﻿using MediatR;
+using Vinculacion.Application.Features.ActorVinculacion.Commands;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Domain.Entities;
 
 namespace Vinculacion.Application.Features.ActorVinculacion.Handlers
 {
-    public class CreateActorPersonaHandler
+    public class CreateActorPersonaHandler: IRequestHandler<CreateActorPersonaCommand, int>
     {
         private readonly IActorPersonaRepository _actorPersonaRepository;
         private readonly IActorExternoRepository _actorExternoRepository;

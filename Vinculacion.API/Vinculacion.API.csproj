@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vinculacion.Application\Vinculacion.Application.csproj" />
+    <ProjectReference Include="..\Vinculacion.Domain\Vinculacion.Domain.csproj" />
   </ItemGroup>
 
 </Project>
