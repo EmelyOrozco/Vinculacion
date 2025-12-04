@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Vinculacion.Application.Extentions;
 using Vinculacion.Application.Features.ActorVinculacion.Dtos;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Services;
@@ -19,9 +18,8 @@ namespace Vinculacion.Application.Services
 
         public async Task<OperationResult<CreateActorPersonaDto>> AddActorPersonaAsync(CreateActorPersonaDto createActorPersonaDto)
         {
-            var entity = createActorPersonaDto.ToActorPersonaFromActorPersonaDto();
-            var result = await _actorPersonaRepository.AddAsync(entity);
-            return OperationResult<CreateActorPersonaDto>.Success("Persona Vinculante creada correctamente",result);
+            var data = await _actorPersonaRepository.AddAsync(createActorPersonaDto);
+            return OperationResult<CreateActorPersonaDto>.Success(data);
         }
 
     }
