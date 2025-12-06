@@ -1,5 +1,4 @@
-﻿
-namespace Vinculacion.Application.Features.ActorVinculacion.Dtos
+﻿namespace Vinculacion.Application.Dtos.ActorExternoDtos
 {
     public class AddActorEmpresaDto
     {

@@ -1,6 +1,6 @@
 ﻿using Vinculacion.Domain.Entities;
 
-namespace Vinculacion.Application.Interfaces.Repositories
+namespace Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository
 {
     public interface IPaisRepository: IBaseRepository<Pais>
     {

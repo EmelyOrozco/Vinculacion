@@ -1,11 +1,11 @@
 ﻿
 using Microsoft.Extensions.Logging;
-using Vinculacion.Application.Features.ActorVinculacion.Dtos;
-using Vinculacion.Application.Interfaces.Repositories;
-using Vinculacion.Application.Interfaces.Services;
+using Vinculacion.Application.Dtos.ActorExternoDtos;
+using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Services.ActorExterno;
 using Vinculacion.Domain.Base;
 
-namespace Vinculacion.Application.Services
+namespace Vinculacion.Application.Services.ActorExterno
 {
     public class ActorEmpresaService: IActorEmpresaService
     {

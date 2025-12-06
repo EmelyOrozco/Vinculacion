@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using Vinculacion.Application.Features.ActorVinculacion.Dtos;
-using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Application.Dtos.ActorExterno;
+using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 
-namespace Vinculacion.Application.Features.ActorVinculacion.Validators
+namespace Vinculacion.Application.Validators.ActorExterno
 {
     public class CrearActorPersonaValidator: AbstractValidator<AddActorPersonaDto>
     {

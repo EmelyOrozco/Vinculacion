@@ -1,28 +1,25 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Logging;
-using Vinculacion.Application.Extentions;
-using Vinculacion.Application.Features.ActorVinculacion.Dtos;
-using Vinculacion.Application.Interfaces.Repositories;
-using Vinculacion.Application.Interfaces.Services;
+using Vinculacion.Application.Dtos.ActorExterno;
+using Vinculacion.Application.Extentions.ActorExternoExtentions;
+using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Services.ActorExterno;
 using Vinculacion.Domain.Base;
 
-namespace Vinculacion.Application.Services
+namespace Vinculacion.Application.Services.ActorExterno
 {
     public class ActorPersonaService: IActorPersonaService
     {
-        private readonly ILogger<ActorPersonaService> _logger;
         private readonly IActorPersonaRepository _actorPersonaRepository;
         private readonly IActorExternoRepository _actorExternoRepository;
         private readonly IValidator<AddActorPersonaDto> _validator;
         private readonly IValidator<AddActorExternoDto> _validatorExterno;
         private readonly IPaisRepository _paisRepository;
 
-        public ActorPersonaService(ILogger<ActorPersonaService> logger,
+        public ActorPersonaService(
             IActorPersonaRepository actorPersonaRepository,
             IActorExternoRepository actorExternoRepository,
             IValidator<AddActorPersonaDto> validator, IValidator<AddActorExternoDto> validatorExterno, IPaisRepository paisRepository)
         {
-            _logger = logger;
             _actorPersonaRepository = actorPersonaRepository;
             _actorExternoRepository = actorExternoRepository;
             _validator = validator;

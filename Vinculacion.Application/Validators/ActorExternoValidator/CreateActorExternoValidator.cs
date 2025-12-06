@@ -1,9 +1,7 @@
-﻿
+﻿using FluentValidation;
+using Vinculacion.Application.Dtos.ActorExterno;
 
-using FluentValidation;
-using Vinculacion.Application.Features.ActorVinculacion.Dtos;
-
-namespace Vinculacion.Application.Features.ActorVinculacion.Validators
+namespace Vinculacion.Application.Validators.ActorExterno
 {
     public class CreateActorExternoValidator: AbstractValidator<AddActorExternoDto>
     {

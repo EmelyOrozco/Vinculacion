@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Vinculacion.API.Extentions;
-using Vinculacion.Application.Interfaces.Repositories;
-using Vinculacion.Application.Interfaces.Services;
-using Vinculacion.Application.Services;
+using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Services.ActorExterno;
+using Vinculacion.Application.Services.ActorExterno;
 using Vinculacion.Persistence.Context;
 using Vinculacion.Persistence.Repositories;
 

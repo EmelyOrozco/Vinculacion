@@ -1,5 +1,5 @@
 ﻿using System.Data.Entity;
-using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence.Base;
 using Vinculacion.Persistence.Context;

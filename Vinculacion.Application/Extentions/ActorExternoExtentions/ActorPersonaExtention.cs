@@ -1,7 +1,7 @@
-﻿using Vinculacion.Application.Features.ActorVinculacion.Dtos;
+﻿using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Domain.Entities;
 
-namespace Vinculacion.Application.Extentions
+namespace Vinculacion.Application.Extentions.ActorExternoExtentions
 {
     public static class ActorPersonaExtention
     {
