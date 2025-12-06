@@ -11,16 +11,25 @@ namespace Vinculacion.Application.Services
     {
         private readonly ILogger<ActorPersonaService> _logger;
         private readonly IActorPersonaRepository _actorPersonaRepository;
-        public ActorPersonaService(ILogger<ActorPersonaService> logger, IActorPersonaRepository actorPersonaRepository)
+        private readonly IActorExternoRepository _actorExternoRepository;
+        public ActorPersonaService(ILogger<ActorPersonaService> logger, IActorPersonaRepository actorPersonaRepository, IActorExternoRepository actorExternoRepository)
         {
             _logger = logger;
             _actorPersonaRepository = actorPersonaRepository;
+            _actorExternoRepository = actorExternoRepository;
         }
 
-        public async Task<OperationResult<CreateActorPersonaDto>> AddActorPersonaAsync(CreateActorPersonaDto createActorPersonaDto)
+        public async Task<OperationResult<CreateActorPersonaDto>> AddActorPersonaAsync(CreateActorPersonaDto createActorPersonaDto, AddActorExternoDto addActorExternoDto)
         {
             var entity = createActorPersonaDto.ToActorPersonaFromActorPersonaDto();
+            var actorExternoEntity = addActorExternoDto.ToActorExternoToDto();
+
+            var ActorExternoID = entity.ActorExternoID;
+
             var result = await _actorPersonaRepository.AddAsync(entity);
+
+            var ActorExterno = await _actorExternoRepository.AddAsync(actorExternoEntity);
+
             return OperationResult<CreateActorPersonaDto>.Success("Persona Vinculante añadida correctamente",result);
         }
 
