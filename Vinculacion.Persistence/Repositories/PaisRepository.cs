@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence.Base;

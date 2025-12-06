@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActorExterno;
-using Vinculacion.Application.Interfaces.Services.ActorExterno;
+using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 
 namespace Vinculacion.API.Controllers
 {
@@ -14,9 +14,10 @@ namespace Vinculacion.API.Controllers
             _actorPersonaService = actorPersonaService;
         }
 
-        public async Task<IActionResult> CreateActorPersona([FromBody] AddActorPersonaDto addActorPersonaDto, AddActorExternoDto addActorExternoDto)
+        [HttpPost]
+        public async Task<IActionResult> CreateActorPersona([FromBody] AddActorPersonaDto addActorPersonaDto)
         {
-            var result = await _actorPersonaService.AddActorPersonaAsync(addActorPersonaDto, addActorExternoDto);
+            var result = await _actorPersonaService.AddActorPersonaAsync(addActorPersonaDto);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);

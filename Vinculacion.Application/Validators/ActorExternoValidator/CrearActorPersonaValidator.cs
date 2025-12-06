@@ -2,14 +2,14 @@
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 
-namespace Vinculacion.Application.Validators.ActorExterno
+namespace Vinculacion.Application.Validators.ActorExternoValidator
 {
     public class CrearActorPersonaValidator: AbstractValidator<AddActorPersonaDto>
     {
-        private readonly IPaisRepository _paisRepository;
+        //private readonly IPaisRepository _paisRepository;
         public CrearActorPersonaValidator(IPaisRepository paisRepository)
         {
-            _paisRepository = paisRepository;
+            //_paisRepository = paisRepository;
 
             RuleFor(x => x.NombreCompleto)
                 .NotEmpty().WithMessage("El nombre completo es obligatorio.")
@@ -26,9 +26,9 @@ namespace Vinculacion.Application.Validators.ActorExterno
 
             //RuleFor(x => x.Sexo)
 
-            RuleFor(x => x.PaisID)
-                .GreaterThan(0).WithMessage("El País es obligatorio.")
-                .MustAsync(async (command, paisID, ct) => { return await _paisRepository.PaisExists(paisID); }).WithMessage("El pais seleccionado no existe");
+            //RuleFor(x => x.PaisID)
+            //    .GreaterThan(0).WithMessage("El País es obligatorio.")
+            //    .MustAsync(async (command, paisID, ct) => { return await _paisRepository.PaisExists(paisID); }).WithMessage("El pais seleccionado no existe");
         }
 
     }

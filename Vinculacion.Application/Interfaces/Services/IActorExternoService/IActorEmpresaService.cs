@@ -1,4 +1,4 @@
-﻿namespace Vinculacion.Application.Interfaces.Services.ActorExterno
+﻿namespace Vinculacion.Application.Interfaces.Services.IActorExternoService
 {
     public interface IActorEmpresaService
     {

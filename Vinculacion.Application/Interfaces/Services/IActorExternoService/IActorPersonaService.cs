@@ -1,10 +1,10 @@
 ﻿using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Domain.Base;
 
-namespace Vinculacion.Application.Interfaces.Services.ActorExterno
+namespace Vinculacion.Application.Interfaces.Services.IActorExternoService
 {
     public interface IActorPersonaService 
     {
-        Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto, AddActorExternoDto addActorExternoDto);
+        Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto);
     }
 }

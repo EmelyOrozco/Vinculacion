@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
-using Vinculacion.Application.Interfaces.Services.ActorExterno;
+using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 using Vinculacion.Domain.Base;
 
-namespace Vinculacion.Application.Services.ActorExterno
+namespace Vinculacion.Application.Services.ActorExternoService
 {
     public class ActorEmpresaService: IActorEmpresaService
     {

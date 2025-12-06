@@ -10,7 +10,8 @@ namespace Vinculacion.Application.Extentions.ActorExternoExtentions
             return new ActorExterno
             {
                 ActorExternoID = actorExterno.ActorExternoID,
-                TipoActorID = actorExterno.TipoActorID
+                TipoActorID = actorExterno.TipoActorID,
+                EstatusID = actorExterno.EstatusID,
             };
         }
     }

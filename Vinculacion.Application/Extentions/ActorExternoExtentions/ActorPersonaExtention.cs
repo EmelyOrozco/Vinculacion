@@ -1,4 +1,5 @@
-﻿using Vinculacion.Application.Dtos.ActorExterno;
+﻿using System.Runtime.CompilerServices;
+using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Domain.Entities;
 
 namespace Vinculacion.Application.Extentions.ActorExternoExtentions
