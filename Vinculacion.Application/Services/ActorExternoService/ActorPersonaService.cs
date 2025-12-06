@@ -48,6 +48,7 @@ namespace Vinculacion.Application.Services.ActorExterno
             }
  
             var actorExternoEntity = addActorExternoDto.ToActorExternoToDto();
+            actorExternoEntity.TipoActorID = 2; 
             var resultActor = await _actorExternoRepository.AddAsync(actorExternoEntity);
 
             var entity = addActorPersonaDto.ToActorPersonaFromActorPersonaDto();
