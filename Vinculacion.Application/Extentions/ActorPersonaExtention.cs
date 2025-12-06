@@ -5,7 +5,7 @@ namespace Vinculacion.Application.Extentions
 {
     public static class ActorPersonaExtention
     {
-        public static ActorPersona ToActorPersonaFromActorPersonaDto(this CreateActorPersonaDto dto)
+        public static ActorPersona ToActorPersonaFromActorPersonaDto(this AddActorPersonaDto dto)
         {
             return new ActorPersona
             {

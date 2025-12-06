@@ -17,9 +17,9 @@ namespace Vinculacion.Application.Services
             _actorEmpresaRepository = actorEmpresaRepository;
         }
 
-        public async Task<OperationResult<CreateActorEmpresaDto>> CreateAsync(CreateActorEmpresaDto createActorEmpresaDto)
+        public async Task<OperationResult<AddActorEmpresaDto>> CreateAsync(AddActorEmpresaDto createActorEmpresaDto)
         {
-            return OperationResult<CreateActorEmpresaDto>.Success("Empresa añadida correctamente", createActorEmpresaDto);
+            return OperationResult<AddActorEmpresaDto>.Success("Empresa añadida correctamente", createActorEmpresaDto);
         }
     }
 }

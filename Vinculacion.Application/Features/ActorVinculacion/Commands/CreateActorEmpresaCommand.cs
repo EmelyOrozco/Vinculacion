@@ -6,6 +6,6 @@ namespace Vinculacion.Application.Features.ActorVinculacion.Commands
 {
     public class CreateActorEmpresaCommand: IRequest<int>
     {
-        public required CreateActorEmpresaDto ActorEmpresa { get; set; }
+        public required AddActorEmpresaDto ActorEmpresa { get; set; }
     }
 }

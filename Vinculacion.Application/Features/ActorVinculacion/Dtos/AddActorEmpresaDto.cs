@@ -1,7 +1,7 @@
 ﻿
 namespace Vinculacion.Application.Features.ActorVinculacion.Dtos
 {
-    public class CreateActorEmpresaDto
+    public class AddActorEmpresaDto
     {
         public string NombreEmpresa { get; set; }
 

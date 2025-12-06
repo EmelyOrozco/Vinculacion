@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
-using Vinculacion.Application.Features.ActorVinculacion.Commands;
 using Vinculacion.Application.Features.ActorVinculacion.Dtos;
 using Vinculacion.Application.Interfaces.Repositories;
 
 namespace Vinculacion.Application.Features.ActorVinculacion.Validators
 {
-    public class CrearActorPersonaValidator: AbstractValidator<CreateActorPersonaDto>
+    public class CrearActorPersonaValidator: AbstractValidator<AddActorPersonaDto>
     {
         private readonly IPaisRepository _paisRepository;
         public CrearActorPersonaValidator(IPaisRepository paisRepository)

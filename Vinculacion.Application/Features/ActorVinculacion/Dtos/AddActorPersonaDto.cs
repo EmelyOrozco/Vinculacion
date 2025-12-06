@@ -2,7 +2,7 @@
 
 namespace Vinculacion.Application.Features.ActorVinculacion.Dtos
 {
-    public record class CreateActorPersonaDto
+    public record class AddActorPersonaDto
     {
 
         public string NombreCompleto { get; set; }
