@@ -19,7 +19,7 @@ namespace Vinculacion.Domain.Base
             return new OperationResult<T>(true, message, data);
         }
 
-        public static OperationResult<T> Failure(string message)
+        public static OperationResult<T> Failure(string message, IEnumerable<string> enumerable)
         {
             return new OperationResult<T>(false, message);
         }

@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Vinculacion.Application.Extentions;
 using Vinculacion.Application.Features.ActorVinculacion.Dtos;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Services;
 using Vinculacion.Domain.Base;
+using Vinculacion.Domain.Entities;
 
 namespace Vinculacion.Application.Services
 {
@@ -12,25 +14,32 @@ namespace Vinculacion.Application.Services
         private readonly ILogger<ActorPersonaService> _logger;
         private readonly IActorPersonaRepository _actorPersonaRepository;
         private readonly IActorExternoRepository _actorExternoRepository;
-        public ActorPersonaService(ILogger<ActorPersonaService> logger, IActorPersonaRepository actorPersonaRepository, IActorExternoRepository actorExternoRepository)
+        private readonly IValidator<CreateActorPersonaDto> _validator;
+        public ActorPersonaService(ILogger<ActorPersonaService> logger, IActorPersonaRepository actorPersonaRepository, IActorExternoRepository actorExternoRepository, IValidator<CreateActorPersonaDto> validator)
         {
             _logger = logger;
             _actorPersonaRepository = actorPersonaRepository;
             _actorExternoRepository = actorExternoRepository;
+            _validator = validator;
         }
 
         public async Task<OperationResult<CreateActorPersonaDto>> AddActorPersonaAsync(CreateActorPersonaDto createActorPersonaDto, AddActorExternoDto addActorExternoDto)
         {
-            var entity = createActorPersonaDto.ToActorPersonaFromActorPersonaDto();
+
+            var validationActorPersona = await _validator.ValidateAsync(createActorPersonaDto);
+            if (!validationActorPersona.IsValid)
+            {
+                return OperationResult<CreateActorPersonaDto>.Failure("Error: ", validationActorPersona.Errors.Select(x => x.ErrorMessage));
+            }
+
             var actorExternoEntity = addActorExternoDto.ToActorExternoToDto();
+            var resultActor = await _actorExternoRepository.AddAsync(actorExternoEntity);
 
-            var ActorExternoID = entity.ActorExternoID;
+            var entity = createActorPersonaDto.ToActorPersonaFromActorPersonaDto();
+            entity.ActorExternoID = actorExternoEntity.ActorExternoID;
+            var resultPersona = await _actorPersonaRepository.AddAsync(entity);
 
-            var result = await _actorPersonaRepository.AddAsync(entity);
-
-            var ActorExterno = await _actorExternoRepository.AddAsync(actorExternoEntity);
-
-            return OperationResult<CreateActorPersonaDto>.Success("Persona Vinculante añadida correctamente",result);
+            return OperationResult<CreateActorPersonaDto>.Success("Persona Vinculante añadida correctamente", resultPersona);
         }
 
     }
