@@ -29,7 +29,7 @@ namespace Vinculacion.Persistence.Base
             }
         }
 
-        public virtual async Task<OperationResult<TEntity>> GetByIdAsync(int id)
+        public virtual async Task<OperationResult<TEntity>> GetByIdAsync(decimal id)
         {
             try
             {

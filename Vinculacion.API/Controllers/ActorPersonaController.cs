@@ -22,8 +22,31 @@ namespace Vinculacion.API.Controllers
             {
                 return BadRequest(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
+
+        [HttpGet]
+        public async  Task<IActionResult> GetActorPersona()
+        {
+            var result = await _actorPersonaService.GetActorPersonaAsync();
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetActorPersonaById(decimal id)
+        {
+            var result = await _actorPersonaService.GetActorPersonaById(id);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
+
 
     }
 }
