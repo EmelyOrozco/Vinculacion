@@ -30,8 +30,14 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<ActorExterno>()
             .HasKey(e => new { e.ActorExternoID });
 
+            modelBuilder.Entity<ActorExterno>().Property(e => e.ActorExternoID)
+          .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<ActorPersona>()
             .HasKey(e => new { e.ActorExternoID });
+
+            modelBuilder.Entity<ActorPersona>().Property(e => e.ActorExternoID)
+          .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<ActorEmpresa>()
             .HasKey(e => new { e.ActorExternoID });

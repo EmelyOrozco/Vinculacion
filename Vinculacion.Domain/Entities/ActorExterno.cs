@@ -8,7 +8,7 @@ namespace Vinculacion.Domain.Entities
 
         public decimal TipoActorID { get; set; }
 
-        public decimal EstatusID { get; set; }
+        public decimal EstadoID { get; set; }
 
         public DateTime FechaRegistro { get; set; }
 

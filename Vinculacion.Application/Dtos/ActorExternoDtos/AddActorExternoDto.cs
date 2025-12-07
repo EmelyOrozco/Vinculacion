@@ -8,7 +8,7 @@
 
         public decimal EstatusID { get; set; } = 1;
 
-        public DateTime FechaRegistro { get; set; } = DateTime.UtcNow.Date;
+        public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
         public DateTime? FechaModificacion { get; set; } = null;
     }

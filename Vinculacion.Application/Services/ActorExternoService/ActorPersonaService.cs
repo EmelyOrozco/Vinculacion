@@ -33,7 +33,6 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
         public async Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto)
         {
-
             var validationActorPersona = await _validator.ValidateAsync(addActorPersonaDto);
             if (!validationActorPersona.IsValid)
             {
@@ -46,7 +45,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             //    return OperationResult<AddActorPersonaDto>.Failure("Error: ", validationActorExterno.Errors.Select(x => x.ErrorMessage));
             //}
 
-            if (await _paisRepository.PaisExists(addActorPersonaDto.PaisID))
+            if (!await _paisRepository.PaisExists(addActorPersonaDto.PaisID))
             {
                 return OperationResult<AddActorPersonaDto>.Failure("El país seleccionado no existe", null);
             }
@@ -54,20 +53,22 @@ namespace Vinculacion.Application.Services.ActorExternoService
             var actorExternoEntity = new ActorExterno
             {
                 TipoActorID = 2,
-                EstatusID = 1,
+                EstadoID = 1,
+                FechaRegistro = DateTime.Now
             };
 
             //_addActorExternoDto.ToActorExternoToDto();
             //actorExternoEntity.TipoActorID = 2; 
-            //actorExternoEntity.EstatusID = 1;
+            //actorExternoEntity.EstadoID = 1;
             var resultActor = await _actorExternoRepository.AddAsync(actorExternoEntity);
+            await _unitOfWork.SaveChangesAsync();
 
             var entity = addActorPersonaDto.ToActorPersonaFromActorPersonaDto();
             entity.ActorExternoID = actorExternoEntity.ActorExternoID;
             var resultPersona = await _actorPersonaRepository.AddAsync(entity);
 
             var result = await _unitOfWork.SaveChangesAsync();
-            return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", result);
+            return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", resultPersona.Data);
         }
 
     }
