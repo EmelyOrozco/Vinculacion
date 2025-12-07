@@ -17,6 +17,11 @@ namespace Vinculacion.Persistence.Repositories
             return await _context.ActorPersona.AnyAsync(e => e.IdentificacionNumero == Identificacion);
         }
 
-       
+        public async Task<ActorPersona?> GetByIdWithActorExternoAsync(decimal id)
+        {
+            return await _context.ActorPersona
+                .Include(p => p.ActorExterno)
+                .FirstOrDefaultAsync(p => p.ActorExternoID == id);
+        }
     }
 }

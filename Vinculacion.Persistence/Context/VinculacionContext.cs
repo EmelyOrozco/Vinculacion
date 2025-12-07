@@ -38,8 +38,10 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<ActorPersona>()
             .HasKey(e => new { e.ActorExternoID });
 
-          //  modelBuilder.Entity<ActorPersona>().Property(e => e.ActorExternoID)
-          //.ValueGeneratedOnAdd();
+            modelBuilder.Entity<ActorPersona>()
+            .HasOne(e => e.ActorExterno)
+            .WithOne()
+            .HasForeignKey<ActorPersona>(e => e.ActorExternoID);
 
             modelBuilder.Entity<ActorEmpresa>()
             .HasKey(e => new { e.ActorExternoID });
