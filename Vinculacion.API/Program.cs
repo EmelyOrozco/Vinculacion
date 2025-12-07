@@ -4,8 +4,11 @@ using Vinculacion.API.Extentions;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
+using Vinculacion.Application.Services.ActividadVinculacionService;
 using Vinculacion.Application.Services.ActorExternoService;
 using Vinculacion.Application.Validators.ActorExternoValidator;
 using Vinculacion.Persistence;
@@ -24,6 +27,9 @@ builder.Services.AddTransient<IActorEmpresaService, ActorEmpresaService>();
 
 builder.Services.AddScoped<IActorPersonaRepository, ActorPersonaRepository>();
 builder.Services.AddTransient<IActorPersonaService, ActorPersonaService>();
+
+builder.Services.AddScoped<IPersonaVinculacionRepository, PersonaVinculacionRepository>();
+builder.Services.AddTransient<IPersonaVinculacionService, PersonaVinculacionService>();
 
 builder.Services.AddScoped<IActorExternoRepository, ActorExternoRepository>();
 builder.Services.AddScoped<IPaisRepository, PaisRepository>();

@@ -39,12 +39,6 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 return OperationResult<AddActorPersonaDto>.Failure("Error: ", validationActorPersona.Errors.Select(x => x.ErrorMessage));
             }
 
-            //var validationActorExterno = await _validatorExterno.ValidateAsync(addActorExternoDto);
-            //if (!validationActorExterno.IsValid)
-            //{
-            //    return OperationResult<AddActorPersonaDto>.Failure("Error: ", validationActorExterno.Errors.Select(x => x.ErrorMessage));
-            //}
-
             if (!await _paisRepository.PaisExists(addActorPersonaDto.PaisID))
             {
                 return OperationResult<AddActorPersonaDto>.Failure("El país seleccionado no existe", null);
@@ -57,9 +51,6 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 FechaRegistro = DateTime.Now
             };
 
-            //_addActorExternoDto.ToActorExternoToDto();
-            //actorExternoEntity.TipoActorID = 2; 
-            //actorExternoEntity.EstadoID = 1;
             var resultActor = await _actorExternoRepository.AddAsync(actorExternoEntity);
             await _unitOfWork.SaveChangesAsync();
 
@@ -69,6 +60,29 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             var result = await _unitOfWork.SaveChangesAsync();
             return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", resultPersona.Data);
+        }
+
+
+        public async Task<OperationResult<List<AddActorPersonaDto>>> GetActorPersonaAsync()
+        {
+            var actorPersona = await _actorPersonaRepository.GetAllAsync(l => true);
+            if (!actorPersona.IsSuccess)
+            {
+                return OperationResult<List<AddActorPersonaDto>>.Failure($"Error obteniendo las personas vinculadas {actorPersona.Message}");
+            }
+
+            return OperationResult<List<AddActorPersonaDto>>.Success("Personas vinculadas: ", actorPersona.Data);
+        }
+
+        public async Task<OperationResult<AddActorPersonaDto>> GetActorPersonaById(decimal id)
+        {
+            var actorPersona = await _actorPersonaRepository.GetByIdAsync(id);
+            if (!actorPersona.IsSuccess)
+            {
+                return OperationResult<AddActorPersonaDto>.Failure($"Error la persona vinculada no existe {actorPersona.Message}");
+            }
+
+            return OperationResult<AddActorPersonaDto>.Success("Persona vinculada: ", actorPersona.Data);
         }
 
     }

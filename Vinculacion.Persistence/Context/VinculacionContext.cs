@@ -23,6 +23,8 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<ActorEmpresa> ActorEmpresa { get; set; }
 
+        public DbSet<PersonaVinculacion> PersonaVinculacion { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -63,10 +65,13 @@ namespace Vinculacion.Persistence.Context
 
 
             modelBuilder.Entity<TipoPersonaVinculacion>()
-         .HasKey(e => new { e.TipoPersonaID });
+            .HasKey(e => new { e.TipoPersonaID });
 
             modelBuilder.Entity<ClasificacionEmpresa>()
-         .HasKey(e => new { e.ClasificacionID });
+            .HasKey(e => new { e.ClasificacionID });
+
+            modelBuilder.Entity<PersonaVinculacion>()
+            .HasKey(e => new { e.PersonaID });
 
         }
 
