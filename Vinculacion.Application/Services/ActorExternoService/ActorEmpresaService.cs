@@ -101,6 +101,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             return OperationResult<List<ActorEmpresaResponseDto>>.Success("Empresas obtenidas correctamente", result);
         }
+
         public async Task<OperationResult<ActorEmpresaResponseDto>> GetActorEmpresaById(decimal id)
         {
             var entity = await _actorEmpresaRepository.GetByIdWithClasificacionesAsync(id);
@@ -115,5 +116,52 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 .Success("Empresa obtenida correctamente", entity.ToResponseDto());
         }
 
+        public async Task<OperationResult<bool>> UpdateActorEmpresaAsync(decimal id,UpdateActorEmpresaDto dto)
+        {
+            var entity = await _actorEmpresaRepository
+                .GetByIdWithClasificacionesAsync(id);
+
+            if (entity == null)
+            {
+                return OperationResult<bool>.Failure("La empresa no existe");
+            }
+
+            if (entity.ActorExterno == null)
+            {
+                return OperationResult<bool>.Failure(
+                    "Error de integridad: ActorExterno no existe");
+            }
+
+            entity.NombreEmpresa = dto.NombreEmpresa;
+            entity.TipoIdentificacion = dto.TipoIdentificacion;
+            entity.IdentificacionNumero = dto.IdentificacionNumero;
+            entity.ContactoNombrePersona = dto.ContactoNombrePersona;
+            entity.ContactoCorreo = dto.ContactoCorreo;
+            entity.ContactoTelefono = dto.ContactoTelefono;
+            entity.ContactoSexoPersona = dto.ContactoSexoPersona;
+            entity.PaisID = dto.PaisID;
+
+            entity.ActorExterno.EstadoID = dto.EstadoID;
+            entity.ActorExterno.FechaModificacion = DateTime.Now;
+
+            var nuevas = dto.Clasificaciones ?? new List<decimal>();
+
+            entity.ActorEmpresaClasificaciones.Clear();
+
+            foreach (var clasificacionId in nuevas)
+            {
+                entity.ActorEmpresaClasificaciones.Add(
+                    new ActorEmpresaClasificacion
+                    {
+                        ActorExternoID = id,
+                        ClasificacionID = clasificacionId
+                    });
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success(
+                "Empresa actualizada correctamente", true);
+        }
     }
 }

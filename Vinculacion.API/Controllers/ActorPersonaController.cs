@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActorExterno;
+using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 
 namespace Vinculacion.API.Controllers
@@ -45,6 +46,18 @@ namespace Vinculacion.API.Controllers
                 return BadRequest(result.Message);
             }
             return Ok(result.Data);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateActorPersona(decimal id,[FromBody] UpdateActorPersonaDto dto)
+        {
+            var result = await _actorPersonaService
+                .UpdateActorPersonaAsync(id, dto);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
         }
     }
 }

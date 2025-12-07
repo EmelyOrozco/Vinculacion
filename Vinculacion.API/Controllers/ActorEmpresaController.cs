@@ -46,5 +46,16 @@ namespace Vinculacion.API.Controllers
             }
             return Ok(result.Data);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateActorEmpresa(decimal id,[FromBody] UpdateActorEmpresaDto dto)
+        {
+            var result = await _actorEmpresaService.UpdateActorEmpresaAsync(id, dto);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace Vinculacion.Application.Interfaces.Services.IActorExternoService
         Task<OperationResult<AddActorEmpresaDto>> AddActorEmpresaAsync(AddActorEmpresaDto addActorEmpresaDto);
         Task<OperationResult<List<ActorEmpresaResponseDto>>> GetActorEmpresaAsync();
         Task<OperationResult<ActorEmpresaResponseDto>> GetActorEmpresaById(decimal id);
+        Task<OperationResult<bool>> UpdateActorEmpresaAsync(decimal id, UpdateActorEmpresaDto dto);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActorExterno;
+using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
@@ -59,7 +60,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             var resultPersona = await _actorPersonaRepository.AddAsync(entity);
 
             var result = await _unitOfWork.SaveChangesAsync();
-            return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", resultPersona.Data);
+            return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", addActorPersonaDto);
         }
 
 
@@ -83,6 +84,34 @@ namespace Vinculacion.Application.Services.ActorExternoService
             }
 
             return OperationResult<AddActorPersonaDto>.Success("Persona vinculada: ", actorPersona.Data);
+        }
+
+        public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id,UpdateActorPersonaDto dto)
+        {
+            var entity = await _actorPersonaRepository.GetByIdWithActorExternoAsync(id);
+
+            if (entity == null)
+                return OperationResult<bool>.Failure("La persona no existe");
+
+            if (entity.ActorExterno == null)
+                return OperationResult<bool>.Failure(
+                    "Error de integridad: ActorExterno no existe");
+
+            entity.NombreCompleto = dto.NombreCompleto;
+            entity.TipoIdentificacion = dto.TipoIdentificacion;
+            entity.IdentificacionNumero = dto.IdentificacionNumero;
+            entity.Correo = dto.Correo;
+            entity.Telefono = dto.Telefono;
+            entity.Sexo = dto.Sexo;
+            entity.PaisID = dto.PaisID;
+
+            entity.ActorExterno.EstadoID = dto.EstadoID;
+            entity.ActorExterno.FechaModificacion = DateTime.Now;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success(
+                "Persona actualizada correctamente", true);
         }
 
     }
