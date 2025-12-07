@@ -2,7 +2,7 @@
 
 namespace Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository
 {
-    public interface IActorEmpresaClasificacionRepository: IBaseRepository<ActorEmpresaClasificacion>
+    public interface IActorEmpresaClasificacionRepository : IBaseRepository<ActorEmpresaClasificacion>
     {
     }
 }

@@ -36,8 +36,8 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<ActorPersona>()
             .HasKey(e => new { e.ActorExternoID });
 
-            modelBuilder.Entity<ActorPersona>().Property(e => e.ActorExternoID)
-          .ValueGeneratedOnAdd();
+          //  modelBuilder.Entity<ActorPersona>().Property(e => e.ActorExternoID)
+          //.ValueGeneratedOnAdd();
 
             modelBuilder.Entity<ActorEmpresa>()
             .HasKey(e => new { e.ActorExternoID });
@@ -45,8 +45,22 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<Pais>()
             .HasKey(e => new { e.PaisID });
 
-            modelBuilder.Entity<ActorEmpresaClasificacion>()
-           .HasKey(e => new { e.ActorExternoID, e.ClasificacionID });
+            // modelBuilder.Entity<ActorEmpresaClasificacion>()
+            //.HasKey(e => new { e.ActorExternoID, e.ClasificacionID });
+
+            modelBuilder.Entity<ActorEmpresaClasificacion>(entity =>
+            {
+                entity.HasKey(e => new { e.ActorExternoID, e.ClasificacionID });
+
+                entity.HasOne(e => e.ActorExterno)
+                    .WithMany()
+                    .HasForeignKey(e => e.ActorExternoID);
+
+                entity.HasOne(e => e.ClasificacionEmpresa)
+                    .WithMany()
+                    .HasForeignKey(e => e.ClasificacionID);
+            });
+
 
             modelBuilder.Entity<TipoPersonaVinculacion>()
          .HasKey(e => new { e.TipoPersonaID });

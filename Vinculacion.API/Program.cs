@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Vinculacion.API.Extentions;
 using Vinculacion.Application.Dtos.ActorExterno;
+using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
@@ -29,6 +30,11 @@ builder.Services.AddScoped<IPaisRepository, PaisRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IValidator<AddActorPersonaDto>, CrearActorPersonaValidator>();
+
+builder.Services.AddScoped<IActorEmpresaClasificacionRepository, ActorEmpresaClasificacionRepository>();
+builder.Services.AddScoped<IValidator<AddActorEmpresaDto>,AddActorEmpresaDtoValidator>();
+
+
 
 builder.Services.AddControllers();
 
