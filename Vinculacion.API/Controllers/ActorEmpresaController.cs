@@ -24,5 +24,27 @@ namespace Vinculacion.API.Controllers
             }
             return Ok(result.Data);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetActorEmpresa()
+        {
+            var result = await _actorEmpresaService.GetActorEmpresaAsync();
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetActorEmpresaById(decimal id)
+        {
+            var result = await _actorEmpresaService.GetActorEmpresaById(id);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
     }
 }

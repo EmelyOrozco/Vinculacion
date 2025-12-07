@@ -44,6 +44,12 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<ActorEmpresa>()
             .HasKey(e => new { e.ActorExternoID });
 
+            modelBuilder.Entity<ActorEmpresa>()
+            .HasOne(e => e.ActorExterno)
+            .WithOne()
+            .HasForeignKey<ActorEmpresa>(e => e.ActorExternoID);
+
+
             modelBuilder.Entity<Pais>()
             .HasKey(e => new { e.PaisID });
 
@@ -54,8 +60,8 @@ namespace Vinculacion.Persistence.Context
             {
                 entity.HasKey(e => new { e.ActorExternoID, e.ClasificacionID });
 
-                entity.HasOne(e => e.ActorExterno)
-                    .WithMany()
+                entity.HasOne(e => e.ActorEmpresa)
+                    .WithMany(a => a.ActorEmpresaClasificaciones)
                     .HasForeignKey(e => e.ActorExternoID);
 
                 entity.HasOne(e => e.ClasificacionEmpresa)

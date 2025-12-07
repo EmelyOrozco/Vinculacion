@@ -46,7 +46,5 @@ namespace Vinculacion.API.Controllers
             }
             return Ok(result.Data);
         }
-
-
     }
 }

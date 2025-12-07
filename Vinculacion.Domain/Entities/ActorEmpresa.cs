@@ -19,6 +19,8 @@
         public decimal? ContactoSexoPersona { get; set; }
 
         public decimal? PaisID { get; set; }
-
+        public ActorExterno ActorExterno { get; set; }
+        public ICollection<ActorEmpresaClasificacion> ActorEmpresaClasificaciones { get; set; }
+            = new List<ActorEmpresaClasificacion>();
     }
 }

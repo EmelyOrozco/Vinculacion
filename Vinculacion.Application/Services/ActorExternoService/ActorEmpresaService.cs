@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -86,6 +85,34 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<AddActorEmpresaDto>.Success(
                 "Empresa Vinculante añadida correctamente",
                 addActorEmpresaDto);
+        }
+
+        public async Task<OperationResult<List<ActorEmpresaResponseDto>>> GetActorEmpresaAsync()
+        {
+            var entities = await _actorEmpresaRepository.GetAllWithClasificacionesAsync();
+
+            if (!entities.Any())
+            {
+                return OperationResult<List<ActorEmpresaResponseDto>>
+                    .Failure("No existen empresas registradas", null);
+            }
+
+            var result = entities.Select(e => e.ToResponseDto()).ToList();
+
+            return OperationResult<List<ActorEmpresaResponseDto>>.Success("Empresas obtenidas correctamente", result);
+        }
+        public async Task<OperationResult<ActorEmpresaResponseDto>> GetActorEmpresaById(decimal id)
+        {
+            var entity = await _actorEmpresaRepository.GetByIdWithClasificacionesAsync(id);
+
+            if (entity == null)
+            {
+                return OperationResult<ActorEmpresaResponseDto>
+                    .Failure("La empresa no existe", null);
+            }
+
+            return OperationResult<ActorEmpresaResponseDto>
+                .Success("Empresa obtenida correctamente", entity.ToResponseDto());
         }
 
     }

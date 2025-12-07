@@ -49,19 +49,19 @@ namespace Vinculacion.Persistence.Base
 
         }   
 
-            public virtual async Task<OperationResult<TEntity>> AddAsync(TEntity entity)
+        public virtual async Task<OperationResult<TEntity>> AddAsync(TEntity entity)
+        {
+            try
             {
-                try
-                {
-                    var result = await _dbSet.AddAsync(entity);
-                    //await _context.SaveChangesAsync();
-                    return OperationResult<TEntity>.Success($"{typeof(TEntity)} agregada correctamente", result);
-                }
-                catch (Exception ex)
-                {
-                    return OperationResult<TEntity>.Failure($"Error agregando {typeof(TEntity)}: {ex.Message}");
-                }
+                var result = await _dbSet.AddAsync(entity);
+                //await _context.SaveChangesAsync();
+                return OperationResult<TEntity>.Success($"{typeof(TEntity)} agregada correctamente", result);
             }
+            catch (Exception ex)
+            {
+                return OperationResult<TEntity>.Failure($"Error agregando {typeof(TEntity)}: {ex.Message}");
+            }
+        }
 
         public virtual async Task<OperationResult<TEntity>> Update(TEntity entity)
         {

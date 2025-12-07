@@ -1,6 +1,4 @@
-﻿
-
-namespace Vinculacion.Domain.Entities
+﻿namespace Vinculacion.Domain.Entities
 {
     public class ActorExterno
     {
