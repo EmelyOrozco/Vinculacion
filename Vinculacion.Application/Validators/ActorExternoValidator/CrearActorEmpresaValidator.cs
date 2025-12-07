@@ -1,8 +1,7 @@
 ﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 
-public class AddActorEmpresaDtoValidator
-    : AbstractValidator<AddActorEmpresaDto>
+public class AddActorEmpresaDtoValidator: AbstractValidator<AddActorEmpresaDto>
 {
     public AddActorEmpresaDtoValidator()
     {

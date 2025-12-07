@@ -25,6 +25,7 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<PersonaVinculacion> PersonaVinculacion { get; set; }
 
+        public DbSet<ActividadVinculacion> ActividadVinculacion { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -38,9 +39,6 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<ActorPersona>()
             .HasKey(e => new { e.ActorExternoID });
 
-          //  modelBuilder.Entity<ActorPersona>().Property(e => e.ActorExternoID)
-          //.ValueGeneratedOnAdd();
-
             modelBuilder.Entity<ActorEmpresa>()
             .HasKey(e => new { e.ActorExternoID });
 
@@ -52,9 +50,6 @@ namespace Vinculacion.Persistence.Context
 
             modelBuilder.Entity<Pais>()
             .HasKey(e => new { e.PaisID });
-
-            // modelBuilder.Entity<ActorEmpresaClasificacion>()
-            //.HasKey(e => new { e.ActorExternoID, e.ClasificacionID });
 
             modelBuilder.Entity<ActorEmpresaClasificacion>(entity =>
             {
@@ -78,6 +73,9 @@ namespace Vinculacion.Persistence.Context
 
             modelBuilder.Entity<PersonaVinculacion>()
             .HasKey(e => new { e.PersonaID });
+
+            modelBuilder.Entity<ActividadVinculacion>()
+                .HasKey(e => new { e.ActividadID });
 
         }
 

@@ -5,60 +5,24 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
 {
     public static class PersonaVinculacionExtention
     {
-        public static PersonaVinculacion ToEstudianteFromDto(this EstudianteDto estudianteDto)
+        public static PersonaVinculacion ToPersonaVinculacionFromDto(this PersonaVinculacionDto personaVinculacionDto)
         {
             return new PersonaVinculacion
             { 
-                TipoPersonaID = 1,
-                NombreCompleto = estudianteDto.NombreCompleto,
-                Correo = estudianteDto.Correo,
-                TelefonoContacto = estudianteDto.TelefonoContacto,
-                Matricula = estudianteDto.Matricula,
-                RecintoID = estudianteDto.RecintoID,
-                EscuelaID = estudianteDto.EscuelaID,
-                CarreraID = estudianteDto.CarreraID
+                TipoPersonaID = personaVinculacionDto.TipoPersonaID,
+                NombreCompleto = personaVinculacionDto.NombreCompleto,
+                Correo = personaVinculacionDto.Correo,
+                TelefonoContacto = personaVinculacionDto.TelefonoContacto,
+                Matricula = personaVinculacionDto.Matricula,
+                RecintoID = personaVinculacionDto.RecintoID,
+                EscuelaID = personaVinculacionDto.EscuelaID,
+                CarreraID = personaVinculacionDto.CarreraID,
+                TipoRelacion = personaVinculacionDto.TipoRelacion,
+                CodigoEmpleado = personaVinculacionDto.CodigoEmpleado,
+                AnoEgreso = personaVinculacionDto.AnoEgreso,
+                CargoEmpresa = personaVinculacionDto.CargoEmpresa
             };
         }
-        public static PersonaVinculacion ToDocenteFromDto(this DocenteDto docenteDto)
-        {
-            return new PersonaVinculacion
-            { 
-                TipoPersonaID = 2,
-                NombreCompleto = docenteDto.NombreCompleto,
-                Correo = docenteDto.Correo,
-                TelefonoContacto = docenteDto.TelefonoContacto,
-                CodigoEmpleado = docenteDto.CodigoEmpleado,
-                RecintoID = docenteDto.RecintoID,
-                EscuelaID = docenteDto.EscuelaID,
-                CarreraID = docenteDto.CarreraID
-            };
-        }
-
-        public static PersonaVinculacion ToEgresadoFromDto(this EgresadoDto egresadoDto)
-        {
-            return new PersonaVinculacion
-            { 
-                TipoPersonaID = 4,
-                NombreCompleto = egresadoDto.NombreCompleto,
-                Correo = egresadoDto.Correo,
-                TelefonoContacto = egresadoDto.TelefonoContacto,
-                AnoEgreso = egresadoDto.AnoEgreso,
-                RecintoID = egresadoDto.RecintoID,
-                EscuelaID = egresadoDto.EscuelaID,
-                CarreraID = egresadoDto.CarreraID
-            };
-        }
-
-        public static PersonaVinculacion ToEmpleadoFromDto(this EjecutivoDto ejecutivoDto)
-        {
-            return new PersonaVinculacion
-            { 
-                TipoPersonaID = 5,
-                NombreCompleto = ejecutivoDto.NombreCompleto,
-                Correo = ejecutivoDto.Correo,
-                TelefonoContacto = ejecutivoDto.TelefonoContacto,
-                CargoEmpresa = ejecutivoDto.CargoEmpresa
-            };
-        }
+       
     }
 }
