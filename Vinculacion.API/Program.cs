@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Vinculacion.API.Extentions;
+using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -10,6 +11,7 @@ using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 using Vinculacion.Application.Services.ActividadVinculacionService;
 using Vinculacion.Application.Services.ActorExternoService;
+using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
@@ -31,6 +33,12 @@ builder.Services.AddTransient<IActorPersonaService, ActorPersonaService>();
 builder.Services.AddScoped<IPersonaVinculacionRepository, PersonaVinculacionRepository>();
 builder.Services.AddTransient<IPersonaVinculacionService, PersonaVinculacionService>();
 
+builder.Services.AddScoped<IActividadVinculacionRepository, ActividadVinculacionRepository>();
+builder.Services.AddTransient<IActividadVinculacionService, ActividadVinculacionService>();
+
+builder.Services.AddScoped<IActividadSubtareasRepository, ActividadSubtareasRepository>();
+builder.Services.AddTransient<IActividadSubtareasService, ActividadSubtareasService>();
+
 builder.Services.AddScoped<IActorExternoRepository, ActorExternoRepository>();
 builder.Services.AddScoped<IPaisRepository, PaisRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -39,6 +47,7 @@ builder.Services.AddScoped<IValidator<AddActorPersonaDto>, CrearActorPersonaVali
 
 builder.Services.AddScoped<IActorEmpresaClasificacionRepository, ActorEmpresaClasificacionRepository>();
 builder.Services.AddScoped<IValidator<AddActorEmpresaDto>,AddActorEmpresaDtoValidator>();
+builder.Services.AddScoped<IValidator<PersonaVinculacionDto>,PersonaVinculacionValidator>();
 
 
 

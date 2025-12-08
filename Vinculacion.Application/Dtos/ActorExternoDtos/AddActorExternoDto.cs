@@ -6,7 +6,7 @@
 
         public decimal TipoActorID { get; set; }
 
-        public decimal EstatusID { get; set; } = 1;
+        public decimal EstadoID { get; set; } = 1;
 
         public DateTime FechaRegistro { get; set; } = DateTime.Now;
 

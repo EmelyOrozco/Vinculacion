@@ -8,10 +8,8 @@ namespace Vinculacion.Persistence.Repositories
 {
     public class ActorEmpresaRepository : BaseRepository<ActorEmpresa>, IActorEmpresaRepository
     {
-        private readonly VinculacionContext _context;
         public ActorEmpresaRepository(VinculacionContext context) : base(context)
         {
-            _context = context;
         }
         public async Task<List<ActorEmpresa>> GetAllWithClasificacionesAsync()
         {

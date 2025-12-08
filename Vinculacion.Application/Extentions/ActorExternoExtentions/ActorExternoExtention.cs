@@ -11,7 +11,7 @@ namespace Vinculacion.Application.Extentions.ActorExternoExtentions
             {
                 ActorExternoID = actorExterno.ActorExternoID,
                 TipoActorID = actorExterno.TipoActorID,
-                EstadoID = actorExterno.EstatusID,
+                EstadoID = actorExterno.EstadoID,
             };
         }
     }

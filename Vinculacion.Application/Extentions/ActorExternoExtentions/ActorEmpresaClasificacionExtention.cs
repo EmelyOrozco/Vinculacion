@@ -5,9 +5,7 @@ namespace Vinculacion.Application.Extentions.ActorExternoExtentions
 {
     public static class ActorEmpresaClasificacionExtention
     {
-        public static List<ActorEmpresaClasificacion> ToActorEmpresaClasificaciones(
-            this AddActorEmpresaDto dto,
-            decimal actorExternoID)
+        public static List<ActorEmpresaClasificacion> ToActorEmpresaClasificaciones(this AddActorEmpresaDto dto, decimal actorExternoID)
         {
             return dto.Clasificaciones.Select(c => new ActorEmpresaClasificacion
             {

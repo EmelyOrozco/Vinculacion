@@ -20,7 +20,6 @@
 
         public decimal? PaisID { get; set; }
         public ActorExterno ActorExterno { get; set; }
-        public ICollection<ActorEmpresaClasificacion> ActorEmpresaClasificaciones { get; set; }
-            = new List<ActorEmpresaClasificacion>();
+        public ICollection<ActorEmpresaClasificacion> ActorEmpresaClasificaciones { get; set; } = new List<ActorEmpresaClasificacion>();
     }
 }

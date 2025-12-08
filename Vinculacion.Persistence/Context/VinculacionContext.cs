@@ -34,7 +34,7 @@ namespace Vinculacion.Persistence.Context
             .HasKey(e => new { e.ActorExternoID });
 
             modelBuilder.Entity<ActorExterno>().Property(e => e.ActorExternoID)
-          .ValueGeneratedOnAdd();
+            .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<ActorPersona>()
             .HasKey(e => new { e.ActorExternoID });
@@ -74,8 +74,26 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<PersonaVinculacion>()
             .HasKey(e => new { e.PersonaID });
 
+            modelBuilder.Entity<PersonaVinculacion>().Property(e => e.PersonaID)
+           .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<ActividadVinculacion>()
-                .HasKey(e => new { e.ActividadID });
+                .HasKey(e => new { e.ActividadId });
+
+            modelBuilder.Entity<ActividadVinculacion>().Property(e => e.ActividadId)
+           .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<ActividadSubtareas>()
+            .HasOne(x => x.ActividadVinculacion)
+            .WithMany(x => x.Subtareas)
+            .HasForeignKey(x => x.ActividadID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ActividadSubtareas>()
+               .HasKey(e => new { e.SubtareaID });
+
+            modelBuilder.Entity<ActividadSubtareas>().Property(e => e.SubtareaID)
+           .ValueGeneratedOnAdd();
 
         }
 

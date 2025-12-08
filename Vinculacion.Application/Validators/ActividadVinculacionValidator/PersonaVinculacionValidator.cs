@@ -1,6 +1,4 @@
-﻿
-
-using FluentValidation;
+﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 
 namespace Vinculacion.Application.Validators.ActividadVinculacionValidator
@@ -29,13 +27,16 @@ namespace Vinculacion.Application.Validators.ActividadVinculacionValidator
                     .MaximumLength(20).WithMessage("La matrícula no puede exceder los 20 caracteres.");
 
                 RuleFor(x => x.CarreraID)
-                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("La carrera es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.EscuelaID)
-                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("La escuela es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.RecintoID)
-                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.");
+                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("El recinto es obligatorio para personas tipo estudiante.");
             });
             When(x => x.TipoPersonaID == 2, () =>
             {
@@ -44,29 +45,36 @@ namespace Vinculacion.Application.Validators.ActividadVinculacionValidator
                     .MaximumLength(20).WithMessage("El código de empleado no puede exceder los 20 caracteres.");
 
                 RuleFor(x => x.CarreraID)
-                   .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                   .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("La carrera es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.EscuelaID)
-                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                    .NotNull().WithMessage("La escuela es obligatoria para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("La escuela es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.RecintoID)
-                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.");
+                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("El recinto es obligatorio para personas tipo estudiante.");
             });
             When (x => x.TipoPersonaID == 3, () =>
             {
                 RuleFor(x => x.AnoEgreso)
                     .NotNull().WithMessage("El año de egreso es obligatorio para personas tipo egresado.")
                     .GreaterThan(1966).WithMessage("El año de egreso debe ser mayor que 1966.")
-                    .LessThanOrEqualTo(DateTime.Now.Year).WithMessage("El año de egreso no puede ser mayor al año actual.");
+                    .LessThanOrEqualTo(DateTime.Now.Year).WithMessage("El año de egreso no puede ser mayor al año actual.")
+                    .GreaterThan(0).WithMessage("El año de egreso es obligatorio para personas tipo egresado.");
 
                 RuleFor(x => x.CarreraID)
-                  .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                  .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.")
+                  .GreaterThan(0).WithMessage("La carrera es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.EscuelaID)
-                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.");
+                    .NotNull().WithMessage("La carrera es obligatoria para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("La escuela es obligatoria para personas tipo estudiante.");
 
                 RuleFor(x => x.RecintoID)
-                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.");
+                    .NotNull().WithMessage("El recinto es obligatorio para personas tipo estudiante.")
+                    .GreaterThan(0).WithMessage("El recinto es obligatorio para personas tipo estudiante.");
 
             });
             When (x => x.TipoPersonaID == 4, () =>

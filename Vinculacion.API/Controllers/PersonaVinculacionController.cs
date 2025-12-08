@@ -21,9 +21,9 @@ namespace Vinculacion.API.Controllers
             var result = await _personaVinculacionService.AddPersonaVinculacion(request);
             if (!result.IsSuccess)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }

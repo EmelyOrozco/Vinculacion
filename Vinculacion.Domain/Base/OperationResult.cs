@@ -1,5 +1,7 @@
 ﻿
 
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace Vinculacion.Domain.Base
 {
     public class OperationResult<T>
@@ -21,7 +23,7 @@ namespace Vinculacion.Domain.Base
 
         public static OperationResult<T> Failure(string message, IEnumerable<string>? enumerable = null)
         {
-            return new OperationResult<T>(false, message);
+            return new OperationResult<T>(false, message, enumerable?.ToList());
         }
 
     }

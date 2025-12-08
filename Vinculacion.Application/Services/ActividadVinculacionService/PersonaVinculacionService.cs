@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
-using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
+using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Domain.Base;
@@ -12,17 +12,21 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
     {
         private readonly IPersonaVinculacionRepository _personaVinculacionRepository;
         private readonly IValidator<PersonaVinculacionDto> _validator;
-        public PersonaVinculacionService(IPersonaVinculacionRepository personaVinculacionRepository, IValidator<PersonaVinculacionDto> validator)
+        private readonly IUnitOfWork _unitOfWork;
+        public PersonaVinculacionService(IPersonaVinculacionRepository personaVinculacionRepository,
+            IValidator<PersonaVinculacionDto> validator,
+            IUnitOfWork unitOfWork)
         {
             _personaVinculacionRepository = personaVinculacionRepository;
             _validator = validator;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto personaVinculacionDto)
         {
             var personaVinculacion = personaVinculacionDto.ToPersonaVinculacionFromDto();
 
-            var result = _validator.Validate(personaVinculacionDto);
+            var result = await _validator.ValidateAsync(personaVinculacionDto);
 
             if (!result.IsValid)
             {
@@ -30,8 +34,9 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             }
 
             var guardar = await _personaVinculacionRepository.AddAsync(personaVinculacion);
+            await _unitOfWork.SaveChangesAsync();
 
-            return OperationResult<PersonaVinculacionDto>.Success("Persona vincunlante guardada correctamente", guardar.Data);
+            return OperationResult<PersonaVinculacionDto>.Success("Persona vincunlante guardada correctamente", personaVinculacionDto);
         }
     }
 }

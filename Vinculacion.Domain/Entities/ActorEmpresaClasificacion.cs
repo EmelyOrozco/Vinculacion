@@ -4,7 +4,6 @@
     {
         public decimal ActorExternoID { get; set; }
         public decimal ClasificacionID { get; set; }
-        //public ActorExterno ActorExterno { get; set; }
         public ActorEmpresa ActorEmpresa { get; set; }
         public ClasificacionEmpresa ClasificacionEmpresa { get; set; }
     }

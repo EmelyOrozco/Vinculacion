@@ -5,9 +5,9 @@ using Vinculacion.Persistence.Context;
 
 namespace Vinculacion.Persistence.Repositories
 {
-    public class ActividadVinculacionRepository: BaseRepository<ActividadVinculacion>, IActividadVinculacionRepository
+    public class ActividadSubtareasRepository: BaseRepository<ActividadSubtareas>, IActividadSubtareasRepository
     {
-        public ActividadVinculacionRepository(VinculacionContext context): base(context)
+        public ActividadSubtareasRepository(VinculacionContext context): base(context)
         {
             
         }
