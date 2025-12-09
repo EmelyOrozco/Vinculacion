@@ -10,7 +10,11 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
             return new Usuario
             {
                 CodigoEmpleado = usuarioDto.Usuario,
-                PasswordHash = usuarioDto.Password
+                PasswordHash = usuarioDto.Password,
+                Idrol = usuarioDto.Idrol,
+                EstadoId = usuarioDto.EstadoId,
+                NombreCompleto = usuarioDto.NombreCompleto,
+                CorreoInstitucional = usuarioDto.CorreoInstitucional
             };
         }
 
@@ -20,7 +24,10 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
             {
                 Usuario = usuario.CodigoEmpleado,
                 Password = usuario.PasswordHash,
+                Idrol = usuario.Idrol,
+                EstadoId = usuario.EstadoId,
                 NombreCompleto = usuario.NombreCompleto,
+                CorreoInstitucional = usuario.CorreoInstitucional
             };
         }
     }
