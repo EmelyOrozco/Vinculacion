@@ -94,8 +94,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 return OperationResult<bool>.Failure("La persona no existe");
 
             if (entity.ActorExterno == null)
-                return OperationResult<bool>.Failure(
-                    "Error de integridad: ActorExterno no existe");
+                return OperationResult<bool>.Failure("Error de integridad: ActorExterno no existe");
 
             entity.NombreCompleto = dto.NombreCompleto;
             entity.TipoIdentificacion = dto.TipoIdentificacion;
@@ -110,8 +109,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             await _unitOfWork.SaveChangesAsync();
 
-            return OperationResult<bool>.Success(
-                "Persona actualizada correctamente", true);
+            return OperationResult<bool>.Success("Persona actualizada correctamente", true);
         }
 
     }

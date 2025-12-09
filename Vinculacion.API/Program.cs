@@ -7,10 +7,13 @@ using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
+using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Application.Services.ActividadVinculacionService;
 using Vinculacion.Application.Services.ActorExternoService;
+using Vinculacion.Application.Services.UsuariosSistemaService;
 using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
 using Vinculacion.Persistence;
@@ -49,6 +52,10 @@ builder.Services.AddScoped<IActorEmpresaClasificacionRepository, ActorEmpresaCla
 builder.Services.AddScoped<IValidator<AddActorEmpresaDto>,AddActorEmpresaDtoValidator>();
 builder.Services.AddScoped<IValidator<PersonaVinculacionDto>,PersonaVinculacionValidator>();
 
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+
+builder.Services.AddTransient<IAuthService, AuthService>();
 
 
 builder.Services.AddControllers();

@@ -38,24 +38,17 @@ namespace Vinculacion.Application.Services.ActorExternoService
             var validationActorEmpresa = await _validator.ValidateAsync(addActorEmpresaDto);
             if (!validationActorEmpresa.IsValid)
             {
-                return OperationResult<AddActorEmpresaDto>.Failure(
-                    "Error:",
-                    validationActorEmpresa.Errors.Select(x => x.ErrorMessage));
+                return OperationResult<AddActorEmpresaDto>.Failure("Error:",validationActorEmpresa.Errors.Select(x => x.ErrorMessage));
             }
 
-            if (addActorEmpresaDto.Clasificaciones == null ||
-                !addActorEmpresaDto.Clasificaciones.Any())
+            if (addActorEmpresaDto.Clasificaciones == null || !addActorEmpresaDto.Clasificaciones.Any())
             {
-                return OperationResult<AddActorEmpresaDto>.Failure(
-                    "Debe seleccionar al menos una clasificación",
-                    null);
+                return OperationResult<AddActorEmpresaDto>.Failure("Debe seleccionar al menos una clasificación",null);
             }
 
             if (!await _paisRepository.PaisExists(addActorEmpresaDto.PaisID))
             {
-                return OperationResult<AddActorEmpresaDto>.Failure(
-                    "El país seleccionado no existe",
-                    null);
+                return OperationResult<AddActorEmpresaDto>.Failure("El país seleccionado no existe",null);
             }
 
             var actorExternoEntity = new ActorExterno
@@ -72,8 +65,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             entity.ActorExternoID = actorExternoEntity.ActorExternoID;
             await _actorEmpresaRepository.AddAsync(entity);
 
-            var clasificaciones = addActorEmpresaDto
-                .ToActorEmpresaClasificaciones(actorExternoEntity.ActorExternoID);
+            var clasificaciones = addActorEmpresaDto.ToActorEmpresaClasificaciones(actorExternoEntity.ActorExternoID);
 
             foreach (var clasificacion in clasificaciones)
             {
@@ -82,9 +74,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             await _unitOfWork.SaveChangesAsync();
 
-            return OperationResult<AddActorEmpresaDto>.Success(
-                "Empresa Vinculante añadida correctamente",
-                addActorEmpresaDto);
+            return OperationResult<AddActorEmpresaDto>.Success("Empresa Vinculante añadida correctamente",addActorEmpresaDto);
         }
 
         public async Task<OperationResult<List<ActorEmpresaResponseDto>>> GetActorEmpresaAsync()
@@ -93,8 +83,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             if (!entities.Any())
             {
-                return OperationResult<List<ActorEmpresaResponseDto>>
-                    .Failure("No existen empresas registradas", null);
+                return OperationResult<List<ActorEmpresaResponseDto>>.Failure("No existen empresas registradas", null);
             }
 
             var result = entities.Select(e => e.ToResponseDto()).ToList();
@@ -108,18 +97,15 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             if (entity == null)
             {
-                return OperationResult<ActorEmpresaResponseDto>
-                    .Failure("La empresa no existe", null);
+                return OperationResult<ActorEmpresaResponseDto>.Failure("La empresa no existe", null);
             }
 
-            return OperationResult<ActorEmpresaResponseDto>
-                .Success("Empresa obtenida correctamente", entity.ToResponseDto());
+            return OperationResult<ActorEmpresaResponseDto>.Success("Empresa obtenida correctamente", entity.ToResponseDto());
         }
 
         public async Task<OperationResult<bool>> UpdateActorEmpresaAsync(decimal id,UpdateActorEmpresaDto dto)
         {
-            var entity = await _actorEmpresaRepository
-                .GetByIdWithClasificacionesAsync(id);
+            var entity = await _actorEmpresaRepository.GetByIdWithClasificacionesAsync(id);
 
             if (entity == null)
             {
@@ -128,8 +114,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             if (entity.ActorExterno == null)
             {
-                return OperationResult<bool>.Failure(
-                    "Error de integridad: ActorExterno no existe");
+                return OperationResult<bool>.Failure("Error de integridad: ActorExterno no existe");
             }
 
             entity.NombreEmpresa = dto.NombreEmpresa;
@@ -160,8 +145,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             await _unitOfWork.SaveChangesAsync();
 
-            return OperationResult<bool>.Success(
-                "Empresa actualizada correctamente", true);
+            return OperationResult<bool>.Success("Empresa actualizada correctamente", true);
         }
     }
 }

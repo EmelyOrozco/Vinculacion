@@ -51,8 +51,7 @@ namespace Vinculacion.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActorPersona(decimal id,[FromBody] UpdateActorPersonaDto dto)
         {
-            var result = await _actorPersonaService
-                .UpdateActorPersonaAsync(id, dto);
+            var result = await _actorPersonaService.UpdateActorPersonaAsync(id, dto);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Message);

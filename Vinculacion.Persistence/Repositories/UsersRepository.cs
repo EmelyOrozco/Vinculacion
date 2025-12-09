@@ -1,0 +1,21 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
+using Vinculacion.Domain.Entities;
+using Vinculacion.Persistence.Base;
+using Vinculacion.Persistence.Context;
+
+namespace Vinculacion.Persistence.Repositories
+{
+    public class UsersRepository: BaseRepository<Usuario>, IUsersRepository
+    {
+        public UsersRepository(VinculacionContext context): base(context)
+        {
+            
+        }
+
+        public async Task<Usuario?> GetCredentialsAsync(string codigoEmpleado, string password)
+        {
+            return await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoEmpleado == codigoEmpleado && u.PasswordHash == password);
+        }
+    }
+}

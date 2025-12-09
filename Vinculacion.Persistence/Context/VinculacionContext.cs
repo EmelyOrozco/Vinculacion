@@ -26,6 +26,10 @@ namespace Vinculacion.Persistence.Context
         public DbSet<PersonaVinculacion> PersonaVinculacion { get; set; }
 
         public DbSet<ActividadVinculacion> ActividadVinculacion { get; set; }
+
+        public DbSet<ActividadSubtareas> ActividadSubtareas { get; set; }
+
+        public DbSet<Usuario> Usuario { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -93,6 +97,12 @@ namespace Vinculacion.Persistence.Context
                .HasKey(e => new { e.SubtareaID });
 
             modelBuilder.Entity<ActividadSubtareas>().Property(e => e.SubtareaID)
+           .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Usuario>()
+               .HasKey(e => new { e.UsuarioId });
+
+            modelBuilder.Entity<Usuario>().Property(e => e.UsuarioId)
            .ValueGeneratedOnAdd();
 
         }
