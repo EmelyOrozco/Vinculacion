@@ -41,7 +41,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 issuer: issuer,
                 claims: claims,
                 audience: _configuration["Jwt:Audience"],
-                notBefore: DateTime.UtcNow,
+                notBefore: DateTime.Now,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials
             );
