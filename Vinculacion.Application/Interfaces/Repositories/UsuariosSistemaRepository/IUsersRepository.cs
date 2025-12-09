@@ -4,6 +4,6 @@ namespace Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaReposit
 {
     public interface IUsersRepository: IBaseRepository<Usuario>
     {
-        Task<Usuario?> GetCredentialsAsync(string codigoEmpleado, string password);
+        Task<Usuario?> GetCredentialsAsync(string codigoEmpleado);
     }
 }
