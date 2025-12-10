@@ -27,7 +27,8 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
                 Idrol = usuario.Idrol,
                 EstadoId = usuario.EstadoId,
                 NombreCompleto = usuario.NombreCompleto,
-                CorreoInstitucional = usuario.CorreoInstitucional
+                CorreoInstitucional = usuario.CorreoInstitucional,
+                NombreRol = usuario.rol.Descripcion
             };
         }
     }

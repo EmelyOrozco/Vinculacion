@@ -6,5 +6,6 @@ namespace Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService
     public interface IUsersService
     {
         Task<OperationResult<UsersDto>> ValidateUserAsync(string codigoEmpleado, string password);
+
     }
 }

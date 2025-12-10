@@ -1,5 +1,9 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Vinculacion.API.Extentions;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Dtos.ActorExterno;
@@ -16,12 +20,10 @@ using Vinculacion.Application.Services.ActorExternoService;
 using Vinculacion.Application.Services.UsuariosSistemaService;
 using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
+using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
 using Vinculacion.Persistence.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +57,8 @@ builder.Services.AddScoped<IActorEmpresaClasificacionRepository, ActorEmpresaCla
 builder.Services.AddScoped<IValidator<AddActorEmpresaDto>,AddActorEmpresaDtoValidator>();
 builder.Services.AddScoped<IValidator<PersonaVinculacionDto>,PersonaVinculacionValidator>();
 
+builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
+
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 
@@ -79,9 +83,12 @@ builder.Services.AddTransient<IAuthService, AuthService>();
                  Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
             };
 
-        builder.Services.AddControllers();
+        
         });
 
+
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

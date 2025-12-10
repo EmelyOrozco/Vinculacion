@@ -21,5 +21,7 @@
         public DateTime? FechaModificacion { get; set; }
 
         public string PasswordHash { get; set; }
+
+        public Rol rol { get; set; }
     }
 }

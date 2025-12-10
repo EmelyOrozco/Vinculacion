@@ -25,22 +25,28 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return null;
 
             var user = result.Data;
+
             var secretKey = _configuration["Jwt:Key"];
             var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim("Nombre", user.NombreCompleto),
-                new Claim("Username", user.Usuario)
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.Usuario),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Usuario),
+                new Claim(JwtRegisteredClaimNames.Email, user.CorreoInstitucional),
+                new Claim(ClaimTypes.Name, user.NombreCompleto),
+                new Claim(ClaimTypes.NameIdentifier, user.Usuario),
+                new Claim(ClaimTypes.Role, user.NombreRol)
             };
 
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 claims: claims,
-                audience: _configuration["Jwt:Audience"],
+                audience: audience,
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials

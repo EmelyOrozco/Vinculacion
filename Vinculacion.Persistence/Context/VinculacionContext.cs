@@ -105,6 +105,15 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<Usuario>().Property(e => e.UsuarioId)
            .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.rol)
+            .WithMany()
+            .HasForeignKey(u => u.Idrol);
+
+            modelBuilder.Entity<Rol>()
+               .HasKey(e => new { e.Idrol });
+
+
         }
 
     }

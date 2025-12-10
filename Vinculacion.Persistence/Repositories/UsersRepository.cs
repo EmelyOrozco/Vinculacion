@@ -15,7 +15,8 @@ namespace Vinculacion.Persistence.Repositories
 
         public async Task<Usuario?> GetCredentialsAsync(string codigoEmpleado)
         {
-            return await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoEmpleado == codigoEmpleado && u.EstadoId == 1);
+            return await _context.Usuario.Include(u => u.rol).FirstOrDefaultAsync(u => u.CodigoEmpleado == codigoEmpleado && u.EstadoId == 1);
         }
+
     }
 }

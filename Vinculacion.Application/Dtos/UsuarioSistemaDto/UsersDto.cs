@@ -21,5 +21,7 @@
 
         public string Password { get; set; }
 
+        public string NombreRol { get; set; }
+
     }
 }

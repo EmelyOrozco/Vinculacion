@@ -28,11 +28,17 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             }
 
             var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+           
+            //var hasher = new PasswordHasher<Usuario>();
+            //var user2 = new Usuario(); // puede estar vacío
+            //var hash = hasher.HashPassword(user, "HASH456");
+            //Console.WriteLine(hash);
 
             if (verifyResult == PasswordVerificationResult.Failed)
             {
                 return OperationResult<UsersDto>.Failure("Credenciales inválidas");
             }
+
             var userDto = user.ToUsersDtoFromEntity();
 
             return OperationResult<UsersDto>.Success("Usuario obtenido correctamente", userDto);

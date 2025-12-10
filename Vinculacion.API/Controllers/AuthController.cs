@@ -20,13 +20,17 @@ namespace Vinculacion.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var token = await _authService.GenerateTokenAsync(login.CodigoEmpleado, login.Password);
 
-            if (token == null)
+            if (token is null)
             {
                 return Unauthorized(new {Message = "Credenciales invalidas"});
             }
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, expirationMinutes = 120});
         }
     }
 }
