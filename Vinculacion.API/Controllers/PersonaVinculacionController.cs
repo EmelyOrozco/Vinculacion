@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
@@ -15,6 +16,7 @@ namespace Vinculacion.API.Controllers
             _personaVinculacionService = personaVinculacionService;
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPost]
         public async Task<IActionResult> AddPersonaVinculacion([FromBody] PersonaVinculacionDto request)
         {

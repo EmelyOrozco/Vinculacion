@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
@@ -15,6 +16,7 @@ namespace Vinculacion.API.Controllers
             _actorPersonaService = actorPersonaService;
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPost]
         public async Task<IActionResult> CreateActorPersona([FromBody] AddActorPersonaDto addActorPersonaDto)
         {
@@ -26,6 +28,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Consultor")]
         [HttpGet]
         public async  Task<IActionResult> GetActorPersona()
         {
@@ -37,6 +40,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Consultor")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActorPersonaById(decimal id)
         {
@@ -48,6 +52,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActorPersona(decimal id,[FromBody] UpdateActorPersonaDto dto)
         {
