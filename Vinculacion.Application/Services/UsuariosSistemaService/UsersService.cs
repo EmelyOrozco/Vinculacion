@@ -6,6 +6,8 @@ using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Vinculacion.Application.Interfaces.Repositories;
+using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace Vinculacion.Application.Services.UsuariosSistemaService
 {
@@ -15,41 +17,57 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
         private readonly IPasswordHasher<Usuario> _passwordHasher;
         private readonly IEmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<UsersAddDto> _validator;
         public UsersService(IUsersRepository usersRepository,
             IPasswordHasher<Usuario> passwordHasher,
             IEmailService emailService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IValidator<UsersAddDto> validator)
         {
             _usersRepository = usersRepository;
             _passwordHasher = passwordHasher;
             _emailService = emailService;
             _unitOfWork = unitOfWork;
+            _validator = validator;
 
         }
 
-        public async Task<OperationResult<UsersDto>> ValidateUserAsync(string codigoEmpleado, string password)
+        public async Task<OperationResult<UsersAddDto>> ValidateUserAsync(string codigoEmpleado, string password)
         {
             var user = await _usersRepository.GetCredentialsAsync(codigoEmpleado);
 
             if (user is null)
             {
-                return OperationResult<UsersDto>.Failure("Credenciales inválidas");
+                return OperationResult<UsersAddDto>.Failure("Credenciales inválidas");
             }
 
             var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
            
             if (verifyResult == PasswordVerificationResult.Failed)
             {
-                return OperationResult<UsersDto>.Failure("Credenciales inválidas");
+                return OperationResult<UsersAddDto>.Failure("Credenciales inválidas");
             }
 
             var userDto = user.ToUsersDtoFromEntity();
 
-            return OperationResult<UsersDto>.Success("Usuario obtenido correctamente", userDto);
+            return OperationResult<UsersAddDto>.Success("Usuario obtenido correctamente", userDto);
         }
 
-        public async Task<OperationResult<UsersDto>> AddUserAsync(UsersDto usersDto)
+        public async Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto)
         {
+            var validation = await _validator.ValidateAsync(usersDto);
+            if (!validation.IsValid)
+            {
+                return OperationResult<UsersAddDto>.Failure("Error: ", validation.Errors.Select(x => x.ErrorMessage));
+            }
+
+            bool cedulaValidation = ValidateCedula(usersDto.Cedula);
+
+            if (cedulaValidation is false)
+            {
+                return OperationResult<UsersAddDto>.Failure("La cedula digitada no es valida");
+            }
+
             usersDto.CorreoInstitucional = NormalizarCorreo(usersDto.CorreoInstitucional);
 
             var correoValido = await _emailService.SendEmail(usersDto.CorreoInstitucional,
@@ -57,7 +75,9 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 "<p>Verificando que este correo exista para completar el registro<p>");
 
             if (!correoValido)
-                return OperationResult<UsersDto>.Failure("El correo institucional no es válido");
+            { 
+                return OperationResult<UsersAddDto>.Failure("El correo institucional no es válido");
+            }
 
             string claveGenerada = GeneratePassword(10);
 
@@ -74,7 +94,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 $"<p>Su contraseña temporal es: <strong>{claveGenerada}</strong></p>" +
                 $"<p>Por favor, cambie su contraseña después de iniciar sesión.</p>");
 
-            return OperationResult<UsersDto>.Success("Usuario agregado correctamente");
+            return OperationResult<UsersAddDto>.Success("Usuario agregado correctamente");
         }
 
         private string GeneratePassword(int length = 10)
@@ -95,6 +115,44 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             var username = email.Split("@")[0];
 
             return username + "@unphu.edu.do"; 
-        }   
+        }  
+        
+        public bool ValidateCedula(string cedula)
+        {
+            if (string.IsNullOrWhiteSpace(cedula))
+            { 
+                return false; 
+            }
+            cedula = cedula.Replace("-", "").Trim();
+
+            if (!Regex.IsMatch(cedula, @"^\d{11}$"))
+            {
+                return false;
+            }
+
+            if (cedula.Substring(0,3) == "000")
+            {
+                return false;
+            }
+
+            int suma = 0;
+
+            for (int i = 0; i < 10; i++)
+            {
+                int digito = cedula[i] - '0';
+                int multiplicador = (i % 2 == 0) ? 1 : 2;
+
+                int resultado = digito * multiplicador;
+
+                if (resultado > 9)
+                    resultado = (resultado / 10) + (resultado % 10);
+
+                suma += resultado;
+            }
+
+            int digitoVerificador = (10 - (suma % 10)) % 10;
+
+            return digitoVerificador == (cedula[10] - '0');
+        }
     }
 }

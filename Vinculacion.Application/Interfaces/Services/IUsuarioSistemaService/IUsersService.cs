@@ -5,7 +5,7 @@ namespace Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService
 {
     public interface IUsersService
     {
-        Task<OperationResult<UsersDto>> ValidateUserAsync(string codigoEmpleado, string password);
-        Task<OperationResult<UsersDto>> AddUserAsync(UsersDto usersDto);
+        Task<OperationResult<UsersAddDto>> ValidateUserAsync(string codigoEmpleado, string password);
+        Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto);
     }
 }

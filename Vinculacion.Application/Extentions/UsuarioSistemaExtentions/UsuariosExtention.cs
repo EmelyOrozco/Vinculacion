@@ -32,14 +32,13 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
             };
         }
 
-        public static Usuario ToUsuarioFromAddDto(this UsersDto usuarioDto)
+        public static Usuario ToUsuarioFromAddDto(this UsersAddDto usuarioDto)
         {
             return new Usuario
             {
-                CodigoEmpleado = usuarioDto.Usuario,
-                PasswordHash = usuarioDto.Password,
+                CodigoEmpleado = usuarioDto.CodigoEmpleado,
                 Idrol = usuarioDto.Idrol,
-                EstadoId = usuarioDto.EstadoId,
+                EstadoId = 1,
                 NombreCompleto = usuarioDto.NombreCompleto,
                 CorreoInstitucional = usuarioDto.CorreoInstitucional,
                 FechaRegistro = DateTime.UtcNow
