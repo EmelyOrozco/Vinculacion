@@ -64,6 +64,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
         builder.Services.AddAuthentication(options =>
         {

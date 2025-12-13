@@ -31,5 +31,19 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
                 NombreRol = usuario.rol.Descripcion
             };
         }
+
+        public static Usuario ToUsuarioFromAddDto(this UsersDto usuarioDto)
+        {
+            return new Usuario
+            {
+                CodigoEmpleado = usuarioDto.Usuario,
+                PasswordHash = usuarioDto.Password,
+                Idrol = usuarioDto.Idrol,
+                EstadoId = usuarioDto.EstadoId,
+                NombreCompleto = usuarioDto.NombreCompleto,
+                CorreoInstitucional = usuarioDto.CorreoInstitucional,
+                FechaRegistro = DateTime.UtcNow
+            };
+        }
     }
 }
