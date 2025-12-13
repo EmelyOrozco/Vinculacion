@@ -1,5 +1,4 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 
 namespace Vinculacion.Application.Validators.UsuariosSistemaValidator
@@ -15,6 +14,15 @@ namespace Vinculacion.Application.Validators.UsuariosSistemaValidator
             RuleFor(x => x.CodigoEmpleado)
                 .NotEmpty()
                 .WithMessage("El codigo de empleado es obligatorio");
+
+            RuleFor(x => x.NombreCompleto)
+                .NotEmpty()
+                .WithMessage("El nombre es obligatorio");
+
+            RuleFor(x => x.Idrol)
+                .NotEmpty()
+                .WithMessage("Debe seleccionar un rol para este usuario");
+            
         }
     }
 }

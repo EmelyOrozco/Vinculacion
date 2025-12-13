@@ -9,6 +9,7 @@ using Vinculacion.API.Extentions;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
+using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
@@ -21,6 +22,7 @@ using Vinculacion.Application.Services.ActorExternoService;
 using Vinculacion.Application.Services.UsuariosSistemaService;
 using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
+using Vinculacion.Application.Validators.UsuariosSistemaValidator;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
@@ -62,6 +64,7 @@ builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IValidator<UsersAddDto>, UsersValidator>();
 
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IEmailService, EmailService>();

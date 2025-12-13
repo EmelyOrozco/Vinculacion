@@ -17,7 +17,7 @@ namespace Vinculacion.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarUsuario([FromBody] UsersDto usersDto) 
+        public async Task<IActionResult> RegistrarUsuario([FromBody] UsersAddDto usersDto) 
         {
             var result = await _usersService.AddUserAsync(usersDto);
 
@@ -25,6 +25,33 @@ namespace Vinculacion.API.Controllers
             {
                 return BadRequest(result); 
             }
+            return Ok(result.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            var result = await _usersService.GetAllUsersAsync();
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result.Data);
+
+        }
+
+        [HttpGet("id")]
+        public async Task<IActionResult> GetUserByID(decimal id)
+        {
+            var result = await _usersService.GetUserById(id);
+
+            if (!result.IsSuccess)
+            { 
+                return BadRequest(result);
+            }
+
             return Ok(result.Data);
         }
     }

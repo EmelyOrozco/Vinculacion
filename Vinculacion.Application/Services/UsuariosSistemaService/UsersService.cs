@@ -154,5 +154,26 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
 
             return digitoVerificador == (cedula[10] - '0');
         }
+
+        public async Task<OperationResult<UsersAddDto>> GetAllUsersAsync()
+        {
+            var users = await _usersRepository.GetAllAsync(l => true);
+
+            if (!users.IsSuccess)
+            {
+                return OperationResult<UsersAddDto>.Failure("Error obteniendo los usuarios del sistema");
+            }
+            return OperationResult<UsersAddDto>.Success("Usuarios: ", users.Data);
+        }
+
+        public async Task<OperationResult<UsersAddDto>> GetUserById(decimal id)
+        {
+            var userid = await _usersRepository.GetByIdAsync(id);
+            if(userid is null)
+            {
+                return OperationResult<UsersAddDto>.Failure($"Error obteniendo el usuario con id {id}");
+            }
+            return OperationResult<UsersAddDto>.Success("Usuario obtenido exitosamente", userid.Data);
+        }
     }
 }

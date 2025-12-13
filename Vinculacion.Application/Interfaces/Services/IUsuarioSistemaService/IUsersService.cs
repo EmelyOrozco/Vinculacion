@@ -7,5 +7,7 @@ namespace Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService
     {
         Task<OperationResult<UsersAddDto>> ValidateUserAsync(string codigoEmpleado, string password);
         Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto);
+        Task<OperationResult<UsersAddDto>> GetAllUsersAsync();
+        Task<OperationResult<UsersAddDto>> GetUserById(decimal id);
     }
 }
