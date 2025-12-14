@@ -1,0 +1,286 @@
+﻿using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
+using Vinculacion.Application.Extentions.ProyectoVinculacionExtentions;
+using Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRepository;
+using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
+using Vinculacion.Domain.Base;
+using FluentValidation;
+using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Domain.Entities;
+using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
+using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
+using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
+
+namespace Vinculacion.Application.Services
+{
+    public class ProyectoService : IProyectoService
+    {
+        private readonly IProyectoRepository _proyectoRepository;
+        private readonly IValidator<AddProyectoDto> _validator;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<UpdateProyectoDto> _updateValidator;
+        private readonly IActividadVinculacionRepository _actividadRepository;
+        private readonly IProyectoActividadRepository _proyectoActividadRepository;
+        private readonly IValidator<AddActividadesToProyectoDto> _addActividadesValidator;
+
+        public ProyectoService(
+            IProyectoRepository proyectoRepository,
+            IValidator<AddProyectoDto> validator,
+            IUnitOfWork unitOfWork,
+            IValidator<UpdateProyectoDto> updateValidator,
+            IActividadVinculacionRepository actividadRepository,
+            IProyectoActividadRepository proyectoActividadRepository,
+            IValidator<AddActividadesToProyectoDto> addActividadesValidator)
+        {
+            _proyectoRepository = proyectoRepository;
+            _validator = validator;
+            _unitOfWork = unitOfWork;
+            _updateValidator = updateValidator;
+            _actividadRepository = actividadRepository;
+            _proyectoActividadRepository = proyectoActividadRepository;
+            _addActividadesValidator = addActividadesValidator;
+        }
+
+        public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request)
+        {
+            var validation = await _validator.ValidateAsync(request);
+            if (!validation.IsValid)
+            {
+                return OperationResult<AddProyectoDto>.Failure(
+                    "Error:",
+                    validation.Errors.Select(e => e.ErrorMessage)
+                );
+            }
+            var entity = request.ToProyectoFromAddDto();
+
+            await _proyectoRepository.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<AddProyectoDto>.Success(
+                "Proyecto creado correctamente",
+                request
+            );
+        }
+
+        public async Task<OperationResult<List<ProyectoResponseDto>>> GetProyectosAsync()
+        {
+            try
+            {
+                var proyectos = await _proyectoRepository.GetAllWithActividadesAsync();
+
+                var data = proyectos
+                    .Select(p => p.ToProyectoResponseDto())
+                    .ToList();
+
+                return OperationResult<List<ProyectoResponseDto>>.Success(
+                    "Proyectos obtenidos correctamente",
+                    data
+                );
+            }
+            catch (Exception)
+            {
+                return OperationResult<List<ProyectoResponseDto>>.Failure(
+                    "Error al obtener los proyectos."
+                );
+            }
+        }
+        public async Task<OperationResult<ProyectoResponseDto>> GetProyectoByIdAsync(decimal proyectoId)
+        {
+            try
+            {
+                var proyecto = await _proyectoRepository.GetByIdWithActividadesAsync(proyectoId);
+
+                if (proyecto == null)
+                {
+                    return OperationResult<ProyectoResponseDto>.Failure(
+                        "El proyecto no existe",
+                        null
+                    );
+                }
+
+                var data = proyecto.ToProyectoResponseDto();
+
+                return OperationResult<ProyectoResponseDto>.Success(
+                    "Proyecto obtenido correctamente",
+                    data
+                );
+            }
+            catch (Exception)
+            {
+                return OperationResult<ProyectoResponseDto>.Failure(
+                    "Error al obtener el proyecto"
+                );
+            }
+        }
+        public async Task<OperationResult<bool>> UpdateProyectoAsync(decimal proyectoId,UpdateProyectoDto dto)
+        {
+            var validation = await _updateValidator.ValidateAsync(dto);
+            if (!validation.IsValid)
+            {
+                return OperationResult<bool>.Failure(
+                    "Error:",
+                    validation.Errors.Select(e => e.ErrorMessage)
+                );
+            }
+
+            var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
+
+            if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
+            {
+                return OperationResult<bool>.Failure("El proyecto no existe", null);
+            }
+
+            var proyecto = proyectoResult.Data;
+
+            ProyectoVinculacionUpdateExtention.UpdateFromDto(proyecto, dto);
+
+            var updateResult = await _proyectoRepository.Update(proyecto);
+            if (!updateResult.IsSuccess)
+            {
+                return OperationResult<bool>.Failure(updateResult.Message, null);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success(
+                "Proyecto actualizado correctamente"
+            );
+        }
+
+        public async Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId)
+        {
+            var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
+            if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
+            {
+                return OperationResult<bool>.Failure("El proyecto no existe", null);
+            }
+
+            var proyecto = proyectoResult.Data;
+
+            var actividadResult = await _actividadRepository.GetByIdAsync(actividadId);
+            if (!actividadResult.IsSuccess || actividadResult.Data == null)
+            {
+                return OperationResult<bool>.Failure("La actividad no existe", null);
+            }
+
+            if (await _proyectoActividadRepository.ExistsActividadInAnyProyecto(actividadId))
+            {
+                return OperationResult<bool>.Failure(
+                    "La actividad ya pertenece a otro proyecto",
+                    null
+                );
+            }
+
+            var relacion = new ProyectoActividad
+            {
+                ProyectoID = proyectoId,
+                ActividadID = actividadId
+            };
+
+            await _proyectoActividadRepository.AddAsync(relacion);
+
+            var cantidad = await _proyectoActividadRepository
+                .CountActividadesByProyecto(proyectoId);
+
+            if (cantidad == 0 && proyecto.EstadoID == 4)
+            {
+                proyecto.EstadoID = 1; 
+                proyecto.FechaModificacion = DateTime.Now;
+                await _proyectoRepository.Update(proyecto);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success(
+                "Actividad vinculada al proyecto correctamente",
+                true
+            );
+        }
+
+        public async Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId, AddActividadesToProyectoDto dto)
+        {
+            var validation = await _addActividadesValidator.ValidateAsync(dto);
+            if (!validation.IsValid)
+            {
+                return OperationResult<bool>.Failure(
+                    "Error:",
+                    validation.Errors.Select(e => e.ErrorMessage)
+                );
+            }
+
+            var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
+            if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
+            {
+                return OperationResult<bool>.Failure("El proyecto no existe", null);
+            }
+
+            var proyecto = proyectoResult.Data;
+
+            var cantidadActual =
+                await _proyectoActividadRepository.CountActividadesByProyecto(proyectoId);
+
+            foreach (var actividadId in dto.ActividadesIds.Distinct())
+            {
+                var actividadResult = await _actividadRepository.GetByIdAsync(actividadId);
+                if (!actividadResult.IsSuccess || actividadResult.Data == null)
+                {
+                    return OperationResult<bool>.Failure(
+                        $"La actividad {actividadId} no existe",
+                        null
+                    );
+                }
+
+                if (await _proyectoActividadRepository
+                    .ExistsActividadInAnyProyecto(actividadId))
+                {
+                    return OperationResult<bool>.Failure(
+                        $"La actividad {actividadId} ya pertenece a otro proyecto",
+                        null
+                    );
+                }
+
+                await _proyectoActividadRepository.AddAsync(new ProyectoActividad
+                {
+                    ProyectoID = proyectoId,
+                    ActividadID = actividadId
+                });
+            }
+
+            if (cantidadActual == 0 && proyecto.EstadoID == 4)
+            {
+                proyecto.EstadoID = 1;
+                proyecto.FechaModificacion = DateTime.Now;
+                await _proyectoRepository.Update(proyecto);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success(
+                "Actividades vinculadas al proyecto correctamente",
+                true
+            );
+        }
+
+        public async Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesByProyectoAsync(decimal proyectoId)
+        {
+            var actividades = await _actividadRepository.GetActividadesByProyectoId(proyectoId);
+
+            var response = actividades.Select(a => a.ToActividadVinculacionDto()).ToList();
+
+            return OperationResult<List<ActividadVinculacionDto>>
+                .Success("Actividades del proyecto obtenidas", response);
+        }
+
+        public async Task<OperationResult<List<ActividadVinculacionDto>>> GetActividadesDisponiblesAsync()
+        {
+            var actividades = await _actividadRepository.GetActividadesDisponibles();
+
+            var response = actividades.Select(a => a.ToActividadVinculacionDto()).ToList();
+
+            if (!actividades.Any())
+            {
+                return OperationResult<List<ActividadVinculacionDto>>.Success("No hay actividades disponibles para asociar a proyectos", actividades);
+            }
+            return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
+        }
+    }
+}

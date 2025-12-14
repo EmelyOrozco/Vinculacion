@@ -30,6 +30,8 @@ namespace Vinculacion.Persistence.Context
         public DbSet<ActividadSubtareas> ActividadSubtareas { get; set; }
 
         public DbSet<Usuario> Usuario { get; set; }
+
+        public DbSet<ProyectoActividad> ProyectoActividad { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -113,6 +115,28 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<Rol>()
                .HasKey(e => new { e.Idrol });
 
+            modelBuilder.Entity<ProyectoVinculacion>()
+                .HasKey(e => new { e.ProyectoID });
+
+            modelBuilder.Entity<ProyectoVinculacion>().Property(e => e.ProyectoID)
+           .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<ProyectoActividad>(entity =>
+            {
+                entity.ToTable("ProyectoActividad");
+
+                entity.HasKey(e => new { e.ProyectoID, e.ActividadID });
+
+                entity.HasOne(e => e.Proyecto)
+                    .WithMany(p => p.ProyectoActividades)
+                    .HasForeignKey(e => e.ProyectoID)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Actividad)
+                    .WithMany()
+                    .HasForeignKey(e => e.ActividadID)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
         }
 

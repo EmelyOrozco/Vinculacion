@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace Vinculacion.Domain.Entities
 {
     public class ActividadSubtareas
@@ -16,7 +18,7 @@ namespace Vinculacion.Domain.Entities
         public decimal? Orden { get; set; }
 
         public DateTime? FechaCompletado { get; set; }
-
+        [JsonIgnore]
         public ActividadVinculacion ActividadVinculacion { get; set; }
     }
 }

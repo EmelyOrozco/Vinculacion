@@ -1,0 +1,129 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
+using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProyectoController : ControllerBase
+{
+    private readonly IProyectoService _proyectoService;
+
+    public ProyectoController(IProyectoService proyectoService)
+    {
+        _proyectoService = proyectoService;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] AddProyectoDto dto)
+    {
+        var result = await _proyectoService.AddProyectoAsync(dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(result);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _proyectoService.GetProyectosAsync();
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(decimal id)
+    {
+        var result = await _proyectoService.GetProyectoByIdAsync(id);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Data);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProyecto(decimal id, [FromBody] UpdateProyectoDto dto)
+    {
+        var result = await _proyectoService.UpdateProyectoAsync(id, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Message);
+    }
+
+    /// <summary>
+    /// Vincula una actividad existente a un proyecto.
+    /// </summary>
+    /// <param name="proyectoId">ID del proyecto.</param>
+    /// <param name="actividadId">ID de la actividad.</param>
+    /// <response code="200">Actividad vinculada correctamente.</response>
+    /// <response code="400">La actividad ya pertenece a otro proyecto o es inválida.</response>
+
+    [HttpPost("{proyectoId}/Actividades/{actividadId}")]
+    public async Task<IActionResult> AddActividadToProyecto(decimal proyectoId,decimal actividadId)
+    {
+        var result = await _proyectoService
+            .AddActividadToProyectoAsync(proyectoId, actividadId);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Message);
+    }
+
+    /// <summary>
+    /// Vincula varias actividades a la vez a un proyecto.
+    /// </summary>
+    /// <param name="proyectoId">ID del proyecto.</param>
+    /// <param name="dto">Lista de IDs de actividades.</param>
+    /// <response code="200">Actividades vinculadas correctamente.</response>
+    /// <response code="400">Alguna actividad no es válida o ya pertenece a otro proyecto.</response>
+
+    [HttpPost("{proyectoId}/Actividades")]
+    public async Task<IActionResult> AddActividadesToProyecto(decimal proyectoId,[FromBody] AddActividadesToProyectoDto dto)
+    {
+        var result = await _proyectoService
+            .AddActividadesToProyectoAsync(proyectoId, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Message);
+    }
+
+    /// <summary>
+    /// Obtiene las actividades vinculadas a un proyecto.
+    /// </summary>
+    [HttpGet("{proyectoId}/Actividades")]
+    public async Task<IActionResult> GetActividadesByProyecto(decimal proyectoId)
+    {
+        var result = await _proyectoService
+            .GetActividadesByProyectoAsync(proyectoId);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result.Data);
+    }
+
+    /// <summary>
+    /// Obtiene las actividades disponibles para ser asociadas a un proyecto.
+    /// </summary>
+    [HttpGet("ActividadesDisponibles")]
+    public async Task<IActionResult> GetActividadesDisponibles()
+    {
+        var result = await _proyectoService.GetActividadesDisponiblesAsync();
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(new{ message = result.Message, data = result.Data});
+    }
+
+}

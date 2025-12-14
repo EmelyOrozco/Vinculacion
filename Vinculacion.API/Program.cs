@@ -1,4 +1,5 @@
 using FluentValidation;
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,18 +9,23 @@ using Vinculacion.API.Extentions;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
+using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
+using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
+using Vinculacion.Application.Services;
 using Vinculacion.Application.Services.ActividadVinculacionService;
 using Vinculacion.Application.Services.ActorExternoService;
 using Vinculacion.Application.Services.UsuariosSistemaService;
 using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
+using Vinculacion.Application.Validators.ProyectoVinculacionValidator;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
@@ -57,6 +63,16 @@ builder.Services.AddScoped<IActorEmpresaClasificacionRepository, ActorEmpresaCla
 builder.Services.AddScoped<IValidator<AddActorEmpresaDto>,AddActorEmpresaDtoValidator>();
 builder.Services.AddScoped<IValidator<PersonaVinculacionDto>,PersonaVinculacionValidator>();
 
+builder.Services.AddScoped<IProyectoRepository, ProyectoRepository>();
+builder.Services.AddScoped<IProyectoActividadRepository, ProyectoActividadRepository>();
+builder.Services.AddScoped<IValidator<UpdateProyectoDto>, UpdateProyectoValidator>();
+builder.Services.AddTransient<IProyectoService, ProyectoService>();
+builder.Services.AddScoped<IValidator<AddActividadesToProyectoDto>,AddActividadesToProyectoDtoValidator>();
+
+
+builder.Services.AddScoped<IValidator<AddProyectoDto>, AddProyectoValidator>();
+
+
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
@@ -90,7 +106,13 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(
+        Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
+
 
 var app = builder.Build();
 

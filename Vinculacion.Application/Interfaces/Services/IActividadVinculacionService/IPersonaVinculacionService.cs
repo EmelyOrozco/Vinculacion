@@ -1,4 +1,5 @@
 ﻿using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
+using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Domain.Base;
 
 namespace Vinculacion.Application.Interfaces.Services.IActividadVinculacionService

@@ -1,5 +1,4 @@
-﻿using Vinculacion.Application.Dtos.ActorExterno;
-using Vinculacion.Application.Dtos.ActorExternoDtos;
+﻿using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Domain.Base;
 
 namespace Vinculacion.Application.Interfaces.Services.IActorExternoService

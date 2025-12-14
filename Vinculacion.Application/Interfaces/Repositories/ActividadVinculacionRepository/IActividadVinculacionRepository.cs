@@ -4,5 +4,7 @@ namespace Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRe
 {
     public interface IActividadVinculacionRepository: IBaseRepository<ActividadVinculacion>
     {
+        Task<List<ActividadVinculacion>> GetActividadesByProyectoId(decimal proyectoId);
+        Task<List<ActividadVinculacion>> GetActividadesDisponibles();
     }
 }

@@ -4,7 +4,7 @@
     {
         public decimal ActividadID { get; set; }
 
-        public decimal EstadoID { get; set; }
+        public decimal? EstadoID { get; set; }
 
         public string? TituloSubtarea { get; set; }
 
