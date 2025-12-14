@@ -31,6 +31,8 @@ using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
 using Vinculacion.Persistence.Repositories;
+using Vinculacion.Application.Validators.UsuariosSistemaValidator;
+using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 
 
 var builder = WebApplication.CreateBuilder(args);
