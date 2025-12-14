@@ -6,5 +6,7 @@ namespace Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaReposit
     {
         Task<Usuario?> GetCredentialsAsync(string codigoEmpleado);
         Task<Usuario?> UsuadioById(decimal id);
+
+        Task<Usuario?> ValidarExistenciaUsuario(string cedula, string codigoEmpleado);
     }
 }

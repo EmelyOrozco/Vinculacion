@@ -23,5 +23,10 @@ namespace Vinculacion.Persistence.Repositories
             return await _context.Usuario.FindAsync(id);
         }
 
+        public async Task<Usuario?> ValidarExistenciaUsuario(string cedula, string codigoEmpleado)
+        {
+            return await _context.Usuario.FirstOrDefaultAsync(x => x.Cedula == cedula || x.CodigoEmpleado == codigoEmpleado);
+        }
+
     }
 }

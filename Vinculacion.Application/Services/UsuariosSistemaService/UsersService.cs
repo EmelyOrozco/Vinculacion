@@ -55,20 +55,26 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
 
         public async Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto)
         {
+            var existenciaUsuario = await _usersRepository.ValidarExistenciaUsuario(usersDto.Cedula, usersDto.CodigoEmpleado);
+
+            if (existenciaUsuario is not null)
+            {
+                return OperationResult<UsersAddDto>.Failure("Este usuario ya existe");
+            }
             var validation = await _validator.ValidateAsync(usersDto);
             if (!validation.IsValid)
             {
                 return OperationResult<UsersAddDto>.Failure("Error: ", validation.Errors.Select(x => x.ErrorMessage));
             }
 
-            bool cedulaValidation = ValidateCedula(usersDto.Cedula);
+            bool cedulaValidation = FuncionesService.ValidateCedula(usersDto.Cedula);
 
             if (cedulaValidation is false)
             {
                 return OperationResult<UsersAddDto>.Failure("La cedula digitada no es valida");
             }
 
-            usersDto.CorreoInstitucional = NormalizarCorreo(usersDto.CorreoInstitucional);
+            usersDto.CorreoInstitucional = NormalizarCorreo(usersDto.CodigoEmpleado);
 
             var correoValido = await _emailService.SendEmail(usersDto.CorreoInstitucional,
                 "Validacion de correo",
@@ -116,44 +122,6 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
 
             return username + "@unphu.edu.do"; 
         }  
-        
-        public bool ValidateCedula(string cedula)
-        {
-            if (string.IsNullOrWhiteSpace(cedula))
-            { 
-                return false; 
-            }
-            cedula = cedula.Replace("-", "").Trim();
-
-            if (!Regex.IsMatch(cedula, @"^\d{11}$"))
-            {
-                return false;
-            }
-
-            if (cedula.Substring(0,3) == "000")
-            {
-                return false;
-            }
-
-            int suma = 0;
-
-            for (int i = 0; i < 10; i++)
-            {
-                int digito = cedula[i] - '0';
-                int multiplicador = (i % 2 == 0) ? 1 : 2;
-
-                int resultado = digito * multiplicador;
-
-                if (resultado > 9)
-                    resultado = (resultado / 10) + (resultado % 10);
-
-                suma += resultado;
-            }
-
-            int digitoVerificador = (10 - (suma % 10)) % 10;
-
-            return digitoVerificador == (cedula[10] - '0');
-        }
 
         public async Task<OperationResult<UsersAddDto>> GetAllUsersAsync()
         {
@@ -197,7 +165,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 usuario.EstadoId = usersUpdateDto.EstadoId.Value;
             }
 
-            if (!string.IsNullOrEmpty(usersUpdateDto.PasswordHash))
+            if (!string.IsNullOrEmpty(usersUpdateDto.PasswordHash) && usersUpdateDto.PasswordHash != "string")
             {
                 usuario.PasswordHash = _passwordHasher.HashPassword(usuario, usersUpdateDto.PasswordHash);
             }

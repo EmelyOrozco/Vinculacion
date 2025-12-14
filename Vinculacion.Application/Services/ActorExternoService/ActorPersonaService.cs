@@ -1,12 +1,14 @@
 ﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
+using Vinculacion.Application.Enums;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Vinculacion.Application.Services.ActorExternoService
 {
@@ -34,12 +36,28 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
         public async Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto)
         {
+            var existenciaActor = await _actorPersonaRepository.ActorPersonaExists(addActorPersonaDto.IdentificacionNumero);
+
+            if (existenciaActor)
+            {
+                return OperationResult<AddActorPersonaDto>.Failure("La persona vinculante ya existe");
+            }
+
             var validationActorPersona = await _validator.ValidateAsync(addActorPersonaDto);
             if (!validationActorPersona.IsValid)
             {
                 return OperationResult<AddActorPersonaDto>.Failure("Error: ", validationActorPersona.Errors.Select(x => x.ErrorMessage));
             }
 
+            if(addActorPersonaDto.TipoIdentificacion != 0)
+            { 
+                bool validarIdentificacion = ValidarIdentificacion(addActorPersonaDto.TipoIdentificacion, addActorPersonaDto.IdentificacionNumero);
+
+                if (validarIdentificacion) 
+                {
+                    return OperationResult<AddActorPersonaDto>.Failure("El no. de identificacion no es valido");
+                }
+            }
             if (!await _paisRepository.PaisExists(addActorPersonaDto.PaisID))
             {
                 return OperationResult<AddActorPersonaDto>.Failure("El país seleccionado no existe", null);
@@ -63,6 +81,16 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", addActorPersonaDto);
         }
 
+        private bool ValidarIdentificacion(decimal? tipo, string? numero)
+        {
+            return tipo switch
+            {
+                (decimal)TipoIdentificacion.Cedula => FuncionesService.ValidateCedula(numero),
+                (decimal)TipoIdentificacion.Pasaporte => FuncionesService.ValidatePassaport(numero),
+                (decimal)TipoIdentificacion.RNC => FuncionesService.ValidateRNC(numero),
+                _ => false
+            };
+        } 
 
         public async Task<OperationResult<List<AddActorPersonaDto>>> GetActorPersonaAsync()
         {

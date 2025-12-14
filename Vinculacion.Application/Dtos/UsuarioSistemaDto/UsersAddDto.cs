@@ -1,7 +1,4 @@
 ﻿
-
-using Vinculacion.Domain.Entities;
-
 namespace Vinculacion.Application.Dtos.UsuarioSistemaDto
 {
     public class UsersAddDto
@@ -14,6 +11,6 @@ namespace Vinculacion.Application.Dtos.UsuarioSistemaDto
 
         public string CodigoEmpleado { get; set; }
 
-        public string CorreoInstitucional { get; set; }
+        public string? CorreoInstitucional { get; set; }
     }
 }
