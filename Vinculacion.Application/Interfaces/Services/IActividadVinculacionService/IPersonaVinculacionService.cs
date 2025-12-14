@@ -1,5 +1,4 @@
 ﻿using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
-using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Domain.Base;
 
 namespace Vinculacion.Application.Interfaces.Services.IActividadVinculacionService
@@ -7,5 +6,8 @@ namespace Vinculacion.Application.Interfaces.Services.IActividadVinculacionServi
     public interface IPersonaVinculacionService
     {
         Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto request);
+        Task<OperationResult<List<PersonaVinculacionDto>>> GetAllAsync();
+        Task<OperationResult<PersonaVinculacionDto>> GetByIdAsync(decimal id);
+        Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionDto dto);
     }
 }

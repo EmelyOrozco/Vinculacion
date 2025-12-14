@@ -176,47 +176,6 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             return OperationResult<UsersAddDto>.Success("Usuario obtenido exitosamente", userid.Data);
         }
 
-        public async Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id)
-        {
-            var usuario = await _usersRepository.UsuadioById(id);
-
-            if (usuario is null)
-            {
-                return OperationResult<UsersUpdateDto>.Failure("Usuario no encontrado");
-            }
-
-            var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
-
-            if (usersUpdateDto.Idrol.HasValue && usersUpdateDto.Idrol.Value > 0)
-            {
-                usuario.Idrol = usersUpdateDto.Idrol.Value;
-            }
-
-            if (usersUpdateDto.EstadoId.HasValue && usersUpdateDto.EstadoId.Value > 0)
-            {
-                usuario.EstadoId = usersUpdateDto.EstadoId.Value;
-            }
-
-            if (!string.IsNullOrEmpty(usersUpdateDto.PasswordHash))
-            {
-                usuario.PasswordHash = _passwordHasher.HashPassword(usuario, usersUpdateDto.PasswordHash);
-            }
-
-            usuario.FechaModificacion = DateTime.Now;
-
-            var usuarioeditado = await _usersRepository.Update(usuario);
-            await _unitOfWork.SaveChangesAsync();
-
-            if (!usuarioeditado.IsSuccess)
-            {
-                return OperationResult<UsersUpdateDto>.Failure("No se pudo actualizar el usuario");
-            }
-            else
-            {
-                return OperationResult<UsersUpdateDto>.Success("Usuario Actualizado correctamente", usuarioeditado.Data);
-            }                
-        }
-
         private async Task<Usuario?> GetUsuarioOrFail(decimal id)
         {
             var usuario = await _usersRepository.UsuadioById(id);

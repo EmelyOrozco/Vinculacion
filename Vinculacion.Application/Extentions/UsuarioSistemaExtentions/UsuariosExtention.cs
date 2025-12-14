@@ -31,16 +31,5 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
                 FechaRegistro = DateTime.UtcNow
             };
         }
-
-        public static Usuario ToUsuarioFromUpdateDto(this UsersUpdateDto usuarioDto)
-        {
-            return new Usuario
-            {
-                Idrol = usuarioDto.Idrol,
-                EstadoId = usuarioDto.EstadoId,
-                PasswordHash = usuarioDto.PasswordHash,
-                FechaModificacion = DateTime.UtcNow
-            };
-        }
     }
 }

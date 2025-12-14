@@ -15,7 +15,7 @@ namespace Vinculacion.API.Controllers
             _actorEmpresaService = actorEmpresaService;
         }
 
-        [Authorize(Roles = "Superusuario, Usuario Final")]
+        [Authorize(Roles = "Superusuario")]
         [HttpPost]
         public async Task<IActionResult> CreateActorEmpresa([FromBody] AddActorEmpresaDto addActorEmpresaDto)
         {
@@ -49,7 +49,7 @@ namespace Vinculacion.API.Controllers
             }
             return Ok(result.Data);
         }
-        [Authorize(Roles = "Superusuario, Usuario Final")]
+        [Authorize(Roles = "Superusuario")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActorEmpresa(decimal id,[FromBody] UpdateActorEmpresaDto dto)
         {
