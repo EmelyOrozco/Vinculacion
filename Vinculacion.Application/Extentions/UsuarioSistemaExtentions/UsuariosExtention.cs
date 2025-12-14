@@ -38,8 +38,8 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
             {
                 Idrol = usuarioDto.Idrol,
                 EstadoId = usuarioDto.EstadoId,
+                FechaModificacion = DateTime.UtcNow,
                 PasswordHash = usuarioDto.PasswordHash,
-                FechaModificacion = DateTime.UtcNow
             };
         }
     }

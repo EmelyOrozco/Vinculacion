@@ -114,7 +114,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<AddActorPersonaDto>.Success("Persona vinculada: ", actorPersona.Data);
         }
 
-        public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id,UpdateActorPersonaDto dto)
+        public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id, UpdateActorPersonaDto dto)
         {
             var entity = await _actorPersonaRepository.GetByIdWithActorExternoAsync(id);
 
@@ -124,21 +124,35 @@ namespace Vinculacion.Application.Services.ActorExternoService
             if (entity.ActorExterno == null)
                 return OperationResult<bool>.Failure("Error de integridad: ActorExterno no existe");
 
-            entity.NombreCompleto = dto.NombreCompleto;
-            entity.TipoIdentificacion = dto.TipoIdentificacion;
-            entity.IdentificacionNumero = dto.IdentificacionNumero;
-            entity.Correo = dto.Correo;
-            entity.Telefono = dto.Telefono;
-            entity.Sexo = dto.Sexo;
-            entity.PaisID = dto.PaisID;
+            if (!string.IsNullOrWhiteSpace(dto.NombreCompleto))
+                entity.NombreCompleto = dto.NombreCompleto;
 
-            entity.ActorExterno.EstadoID = dto.EstadoID;
+            if (dto.TipoIdentificacion.HasValue && dto.TipoIdentificacion > 0)
+                entity.TipoIdentificacion = dto.TipoIdentificacion.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.IdentificacionNumero))
+                entity.IdentificacionNumero = dto.IdentificacionNumero;
+
+            if (!string.IsNullOrWhiteSpace(dto.Correo))
+                entity.Correo = dto.Correo;
+
+            if (!string.IsNullOrWhiteSpace(dto.Telefono))
+                entity.Telefono = dto.Telefono;
+
+            if (dto.Sexo.HasValue && dto.Sexo > 0)
+                entity.Sexo = dto.Sexo.Value;
+
+            if (dto.PaisID.HasValue && dto.PaisID > 0)
+                entity.PaisID = dto.PaisID.Value;
+
+            if (dto.EstadoID.HasValue && dto.EstadoID > 0)
+                entity.ActorExterno.EstadoID = dto.EstadoID.Value;
+
             entity.ActorExterno.FechaModificacion = DateTime.Now;
 
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success("Persona actualizada correctamente", true);
         }
-
     }
 }

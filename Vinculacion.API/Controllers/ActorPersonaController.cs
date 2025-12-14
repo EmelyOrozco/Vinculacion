@@ -16,7 +16,7 @@ namespace Vinculacion.API.Controllers
             _actorPersonaService = actorPersonaService;
         }
 
-        [Authorize(Roles = "Superusuario, Usuario Final")]
+        [Authorize(Roles = "Superusuario")]
         [HttpPost]
         public async Task<IActionResult> CreateActorPersona([FromBody] AddActorPersonaDto addActorPersonaDto)
         {
@@ -52,7 +52,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
-        [Authorize(Roles = "Superusuario, Usuario Final")]
+        [Authorize(Roles = "Superusuario")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActorPersona(decimal id,[FromBody] UpdateActorPersonaDto dto)
         {

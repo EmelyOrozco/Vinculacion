@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 
@@ -6,6 +7,7 @@ namespace Vinculacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Superusuario")]
     public class UsersController : ControllerBase
     {
        private readonly IUsersService _usersService;
@@ -53,16 +55,15 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UsersUpdateDto usersUpdateDto,decimal id)
+        [HttpPut("{id}/Rol")]
+        public async Task<IActionResult> UpdateUserRole(decimal id, [FromBody] UsersUpdateDto dto)
         {
-            var result = await _usersService.UpdateUserAsync(usersUpdateDto, id);
-            if (!result.IsSuccess) 
-            {
-                return BadRequest(result.Message);
-            }
+            var result = await _usersService.UpdateUserRolAsync(id, dto);
 
-            return Ok(result.Data);
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok();
         }
 
         [HttpPut("{id}/State")]

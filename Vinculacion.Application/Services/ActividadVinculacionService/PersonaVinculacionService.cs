@@ -5,6 +5,7 @@ using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Domain.Base;
+using Vinculacion.Domain.Entities;
 
 namespace Vinculacion.Application.Services.ActividadVinculacionService
 {
@@ -38,5 +39,86 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             return OperationResult<PersonaVinculacionDto>.Success("Persona vincunlante guardada correctamente", personaVinculacionDto);
         }
+
+        public async Task<OperationResult<List<PersonaVinculacionDto>>> GetAllAsync()
+        {
+            var result = await _personaVinculacionRepository.GetAllAsync(x => true);
+
+            if (!result.IsSuccess)
+                return OperationResult<List<PersonaVinculacionDto>>.Failure("Error obteniendo personas vinculadas");
+
+            var entidades = (List<PersonaVinculacion>)result.Data;
+
+            var data = entidades
+                .Select(x => x.ToPersonaVinculacionDto())
+                .ToList();
+
+
+            return OperationResult<List<PersonaVinculacionDto>>.Success("Personas vinculadas", data);
+        }
+
+        public async Task<OperationResult<PersonaVinculacionDto>> GetByIdAsync(decimal id)
+        {
+            var result = await _personaVinculacionRepository.GetByIdAsync(id);
+
+            if (!result.IsSuccess || result.Data == null)
+                return OperationResult<PersonaVinculacionDto>.Failure("Persona vinculada no encontrada");
+
+            return OperationResult<PersonaVinculacionDto>.Success(
+                "Persona vinculada encontrada",
+                result.Data.ToPersonaVinculacionDto()
+            );
+        }
+
+        public async Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionDto dto)
+        {
+            var entityResult = await _personaVinculacionRepository.GetByIdAsync(id);
+
+            if (!entityResult.IsSuccess || entityResult.Data == null)
+                return OperationResult<bool>.Failure("Persona vinculada no encontrada");
+
+            var entity = entityResult.Data;
+
+            if (dto.TipoPersonaID.HasValue && dto.TipoPersonaID > 0)
+                entity.TipoPersonaID = dto.TipoPersonaID.Value;
+
+            if (dto.RecintoID.HasValue && dto.RecintoID > 0)
+                entity.RecintoID = dto.RecintoID.Value;
+
+            if (dto.EscuelaID.HasValue && dto.EscuelaID > 0)
+                entity.EscuelaID = dto.EscuelaID.Value;
+
+            if (dto.CarreraID.HasValue && dto.CarreraID > 0)
+                entity.CarreraID = dto.CarreraID.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.NombreCompleto))
+                entity.NombreCompleto = dto.NombreCompleto;
+
+            if (!string.IsNullOrWhiteSpace(dto.Correo))
+                entity.Correo = dto.Correo;
+
+            if (!string.IsNullOrWhiteSpace(dto.TelefonoContacto))
+                entity.TelefonoContacto = dto.TelefonoContacto;
+
+            if (dto.TipoRelacion.HasValue && dto.TipoRelacion > 0)
+                entity.TipoRelacion = dto.TipoRelacion.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.Matricula))
+                entity.Matricula = dto.Matricula;
+
+            if (!string.IsNullOrWhiteSpace(dto.CodigoEmpleado))
+                entity.CodigoEmpleado = dto.CodigoEmpleado;
+
+            if (dto.AnoEgreso.HasValue && dto.AnoEgreso > 0)
+                entity.AnoEgreso = dto.AnoEgreso.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.CargoEmpresa))
+                entity.CargoEmpresa = dto.CargoEmpresa;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<bool>.Success("Persona vinculada actualizada correctamente", true);
+        }
+
     }
 }

@@ -7,14 +7,30 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
     {
         public static void UpdateFromDto(this ProyectoVinculacion entity, UpdateProyectoDto dto)
         {
-            entity.PersonaID = dto.PersonaID;
-            entity.RecintoID = dto.RecintoID;
-            entity.TituloProyecto = dto.TituloProyecto;
-            entity.DescripcionGeneral = dto.DescripcionGeneral;
-            entity.FechaInicio = dto.FechaInicio;
-            entity.FechaFin = dto.FechaFin;
-            entity.Ambito = dto.Ambito;
-            entity.Sector = dto.Sector;
+            if (dto.PersonaID.HasValue && dto.PersonaID > 0)
+                entity.PersonaID = dto.PersonaID.Value;
+
+            if (dto.RecintoID.HasValue && dto.RecintoID > 0)
+                entity.RecintoID = dto.RecintoID.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.TituloProyecto))
+                entity.TituloProyecto = dto.TituloProyecto;
+
+            if (!string.IsNullOrWhiteSpace(dto.DescripcionGeneral))
+                entity.DescripcionGeneral = dto.DescripcionGeneral;
+
+            if (dto.FechaInicio.HasValue)
+                entity.FechaInicio = dto.FechaInicio.Value;
+
+            if (dto.FechaFin.HasValue)
+                entity.FechaFin = dto.FechaFin.Value;
+
+            if (dto.Ambito.HasValue && dto.Ambito > 0)
+                entity.Ambito = dto.Ambito.Value;
+
+            if (dto.Sector.HasValue && dto.Sector > 0)
+                entity.Sector = dto.Sector.Value;
+
             entity.FechaModificacion = DateTime.Now;
         }
     }

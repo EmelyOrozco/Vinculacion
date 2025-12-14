@@ -27,5 +27,41 @@ namespace Vinculacion.API.Controllers
             }
             return Ok(result.Data);
         }
+
+        [Authorize(Roles = "Superusuario, Usuario Consultor")]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _personaVinculacionService.GetAllAsync();
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
+        }
+
+        [Authorize(Roles = "Superusuario, Usuario Consultor")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(decimal id)
+        {
+            var result = await _personaVinculacionService.GetByIdAsync(id);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
+        }
+
+        [Authorize(Roles = "Superusuario, Usuario Final")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(decimal id, [FromBody] PersonaVinculacionDto dto)
+        {
+            var result = await _personaVinculacionService.UpdateAsync(id, dto);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Message);
+        }
     }
 }
