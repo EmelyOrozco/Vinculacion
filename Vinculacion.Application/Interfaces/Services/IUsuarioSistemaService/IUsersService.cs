@@ -9,5 +9,6 @@ namespace Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService
         Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto);
         Task<OperationResult<UsersAddDto>> GetAllUsersAsync();
         Task<OperationResult<UsersAddDto>> GetUserById(decimal id);
+        Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id);
     }
 }

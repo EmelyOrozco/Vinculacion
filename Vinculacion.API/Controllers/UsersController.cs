@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.UsuarioSistemaDto;
-using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 
 namespace Vinculacion.API.Controllers
@@ -50,6 +48,18 @@ namespace Vinculacion.API.Controllers
             if (!result.IsSuccess)
             { 
                 return BadRequest(result);
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] UsersUpdateDto usersUpdateDto,decimal id)
+        {
+            var result = await _usersService.UpdateUserAsync(usersUpdateDto, id);
+            if (!result.IsSuccess) 
+            {
+                return BadRequest(result.Message);
             }
 
             return Ok(result.Data);

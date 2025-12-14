@@ -175,5 +175,23 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             }
             return OperationResult<UsersAddDto>.Success("Usuario obtenido exitosamente", userid.Data);
         }
+
+        public async Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id)
+        {
+            var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
+            entity.UsuarioId = id;
+
+            var usuarioeditado = await _usersRepository.Update(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (!usuarioeditado.IsSuccess)
+            {
+                return OperationResult<UsersUpdateDto>.Failure("No se pudo actualizar el usuario");
+            }
+            else
+            {
+                return OperationResult<UsersUpdateDto>.Success("Usuario Actualizado correctamente", usuarioeditado.Data);
+            }                
+        }
     }
 }

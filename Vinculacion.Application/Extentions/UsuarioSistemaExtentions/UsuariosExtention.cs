@@ -5,19 +5,6 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
 {
     public static class UsuariosExtention
     {
-        public static Usuario ToUsersValidationFromDto(this UsersDto usuarioDto)
-        {
-            return new Usuario
-            {
-                CodigoEmpleado = usuarioDto.Usuario,
-                PasswordHash = usuarioDto.Password,
-                Idrol = usuarioDto.Idrol,
-                EstadoId = usuarioDto.EstadoId,
-                NombreCompleto = usuarioDto.NombreCompleto,
-                CorreoInstitucional = usuarioDto.CorreoInstitucional
-            };
-        }
-
         public static UsersDto ToUsersDtoFromEntity(this Usuario usuario)
         {
             return new UsersDto
@@ -42,6 +29,17 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
                 NombreCompleto = usuarioDto.NombreCompleto,
                 CorreoInstitucional = usuarioDto.CorreoInstitucional,
                 FechaRegistro = DateTime.UtcNow
+            };
+        }
+
+        public static Usuario ToUsuarioFromUpdateDto(this UsersUpdateDto usuarioDto)
+        {
+            return new Usuario
+            {
+                Idrol = usuarioDto.Idrol,
+                EstadoId = usuarioDto.EstadoId,
+                PasswordHash = usuarioDto.PasswordHash,
+                FechaModificacion = DateTime.UtcNow
             };
         }
     }
