@@ -40,7 +40,7 @@ namespace Vinculacion.API.Controllers
 
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUserByID(decimal id)
         {
             var result = await _usersService.GetUserById(id);
@@ -63,6 +63,31 @@ namespace Vinculacion.API.Controllers
             }
 
             return Ok(result.Data);
+        }
+
+        [HttpPut("{id}/State")]
+        public async Task<IActionResult> UpdateStateUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
+        {
+            var result = await _usersService.UpdateUserStateAsync(id, usersUpdateDto);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpPut("{id}/Pass")]
+        public async Task<IActionResult> UpdatePasswordUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
+        {
+            var result = await _usersService.UpdateUserPasswordAsync(id, usersUpdateDto);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok();
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Vinculacion.API.Controllers
             _authService = authService;
         }
 
-        [Authorize]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {

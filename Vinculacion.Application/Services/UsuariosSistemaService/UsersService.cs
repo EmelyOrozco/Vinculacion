@@ -178,10 +178,33 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
 
         public async Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id)
         {
-            var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
-            entity.UsuarioId = id;
+            var usuario = await _usersRepository.UsuadioById(id);
 
-            var usuarioeditado = await _usersRepository.Update(entity);
+            if (usuario is null)
+            {
+                return OperationResult<UsersUpdateDto>.Failure("Usuario no encontrado");
+            }
+
+            var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
+
+            if (usersUpdateDto.Idrol.HasValue && usersUpdateDto.Idrol.Value > 0)
+            {
+                usuario.Idrol = usersUpdateDto.Idrol.Value;
+            }
+
+            if (usersUpdateDto.EstadoId.HasValue && usersUpdateDto.EstadoId.Value > 0)
+            {
+                usuario.EstadoId = usersUpdateDto.EstadoId.Value;
+            }
+
+            if (!string.IsNullOrEmpty(usersUpdateDto.PasswordHash))
+            {
+                usuario.PasswordHash = _passwordHasher.HashPassword(usuario, usersUpdateDto.PasswordHash);
+            }
+
+            usuario.FechaModificacion = DateTime.Now;
+
+            var usuarioeditado = await _usersRepository.Update(usuario);
             await _unitOfWork.SaveChangesAsync();
 
             if (!usuarioeditado.IsSuccess)
@@ -193,5 +216,107 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return OperationResult<UsersUpdateDto>.Success("Usuario Actualizado correctamente", usuarioeditado.Data);
             }                
         }
+
+        private async Task<Usuario?> GetUsuarioOrFail(decimal id)
+        {
+            var usuario = await _usersRepository.UsuadioById(id);
+
+            if (usuario is null)
+            {
+                return null;
+            }
+
+            return usuario;
+        }
+
+        public async Task<OperationResult<bool>> UpdateUserRolAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        {
+            if (!usersUpdateDto.Idrol.HasValue || usersUpdateDto.Idrol.Value <= 0)
+            {
+                return OperationResult<bool>.Failure("Rol inválido");
+            }
+
+            var usuario = await GetUsuarioOrFail(id);
+
+            if (usuario is null)
+            {
+                return OperationResult<bool>.Failure("Usuario no encontrado");
+            }
+
+            usuario.Idrol = usersUpdateDto.Idrol;
+            usuario.FechaModificacion = DateTime.Now;
+
+            var usuarioeditado = await _usersRepository.Update(usuario);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (!usuarioeditado.IsSuccess)
+            {
+                return OperationResult<bool>.Failure("No se pudo actualizar el usuario");
+            }
+            else { 
+
+                return OperationResult<bool>.Success("Rol actualizado correctamente", true);
+            }
+        }
+
+        public async Task<OperationResult<bool>> UpdateUserStateAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        {
+            if (!usersUpdateDto.EstadoId.HasValue || usersUpdateDto.EstadoId.Value <= 0)
+            {
+                return OperationResult<bool>.Failure("Estado inválido");
+            }
+
+            var usuario = await GetUsuarioOrFail(id);
+
+            if (usuario is null)
+            {
+                return OperationResult<bool>.Failure("Usuario no encontrado");
+            }
+
+            usuario.EstadoId = usersUpdateDto.EstadoId;
+            usuario.FechaModificacion = DateTime.Now;
+
+            var estadoeditado = await _usersRepository.Update(usuario);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (!estadoeditado.IsSuccess)
+            {
+                return OperationResult<bool>.Failure("No se pudo actualizar el usuario");
+            }
+            else
+            {
+                return OperationResult<bool>.Success("Usuario Actualizado correctamente", true);
+            }  
+        }
+
+        public async Task<OperationResult<bool>> UpdateUserPasswordAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        {
+            if (string.IsNullOrWhiteSpace(usersUpdateDto.PasswordHash))
+                return OperationResult<bool>.Failure("La contraseña es requerida");
+
+            var usuario = await GetUsuarioOrFail(id);
+
+            if (usuario is null)
+            { 
+                return OperationResult<bool>.Failure("Usuario no encontrado");
+            }
+
+            usuario.PasswordHash = _passwordHasher.HashPassword(usuario, usersUpdateDto.PasswordHash);
+
+            usuario.FechaModificacion = DateTime.Now;
+
+            var passwordedited = await _usersRepository.Update(usuario);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (!passwordedited.IsSuccess)
+            {
+                return OperationResult<bool>.Failure("No se pudo actualizar el usuario");
+            }
+            else
+            {
+                return OperationResult<bool>.Success("Usuario Actualizado correctamente", true);
+            }
+        }
+
     }
 }

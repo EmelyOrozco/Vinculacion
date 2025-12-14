@@ -18,5 +18,10 @@ namespace Vinculacion.Persistence.Repositories
             return await _context.Usuario.Include(u => u.rol).FirstOrDefaultAsync(u => u.CodigoEmpleado == codigoEmpleado && u.EstadoId == 1);
         }
 
+        public async Task<Usuario?> UsuadioById(decimal id)
+        {
+            return await _context.Usuario.FindAsync(id);
+        }
+
     }
 }
