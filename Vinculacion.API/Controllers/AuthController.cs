@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 using Vinculacion.API.Models;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 
@@ -17,6 +16,7 @@ namespace Vinculacion.API.Controllers
             _authService = authService;
         }
 
+        [Authorize]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] Login login)
         {

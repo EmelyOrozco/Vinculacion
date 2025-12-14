@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 
@@ -14,6 +15,7 @@ namespace Vinculacion.API.Controllers
             _actividadVinculacionService = actividadVinculacionService;
         }
 
+        [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ActividadVinculacionDto actividadVinculacionDto)
         {

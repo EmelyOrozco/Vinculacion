@@ -10,17 +10,17 @@
 
         public string NombreCompleto { get; set; }
 
-        public string Cedula { get; set; }
+        public string? Cedula { get; set; }
 
-        public string CodigoEmpleado { get; set; }
+        public string? CodigoEmpleado { get; set; }
 
-        public string CorreoInstitucional { get; set; }
+        public string? CorreoInstitucional { get; set; }
 
         public DateTime FechaRegistro { get; set; }
 
         public DateTime? FechaModificacion { get; set; }
 
-        public string PasswordHash { get; set; }
+        public string? PasswordHash { get; set; }
 
         public Rol rol { get; set; }
     }
