@@ -154,6 +154,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             }
 
             var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
+            entity.UsuarioId = id;
 
             if (usersUpdateDto.Idrol.HasValue && usersUpdateDto.Idrol.Value > 0)
             {

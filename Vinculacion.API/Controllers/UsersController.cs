@@ -48,8 +48,21 @@ namespace Vinculacion.API.Controllers
             var result = await _usersService.GetUserById(id);
 
             if (!result.IsSuccess)
-            { 
+            {
                 return BadRequest(result);
+            }
+
+            return Ok(result.Data);
+        }
+
+        [Authorize(Roles = "Superusuario")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
+        {
+            var result = await _usersService.UpdateUserAsync(usersUpdateDto, id);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
             }
 
             return Ok(result.Data);
