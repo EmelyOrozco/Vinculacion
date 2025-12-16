@@ -27,5 +27,10 @@ namespace Vinculacion.Persistence.Repositories
                 .FirstOrDefaultAsync(e => e.ActorExternoID == id);
         }
 
+        public async Task<ActorEmpresa?> ActorEmpresaExistsAsync (string identificacionNumero, string NombreEmpresa)
+        {
+            return await _context.ActorEmpresa.FirstOrDefaultAsync(x => x.IdentificacionNumero == identificacionNumero);
+        }
+
     }
 }

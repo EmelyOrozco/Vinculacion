@@ -1,9 +1,21 @@
 ﻿using System.Text.RegularExpressions;
+using Vinculacion.Application.Enums;
 
 namespace Vinculacion.Application.Services
 {
     public static class FuncionesService
     {
+        public static bool ValidarIdentificacion(decimal? tipo, string? numero)
+        {
+            return tipo switch
+            {
+                (decimal)TipoIdentificacion.Cedula => ValidateCedula(numero),
+                (decimal)TipoIdentificacion.Pasaporte => ValidatePassaport(numero),
+                (decimal)TipoIdentificacion.RNC => ValidateRNC(numero),
+                _ => false
+            };
+        }
+
         public static bool ValidateCedula(string? cedula)
         {
             if (string.IsNullOrWhiteSpace(cedula))

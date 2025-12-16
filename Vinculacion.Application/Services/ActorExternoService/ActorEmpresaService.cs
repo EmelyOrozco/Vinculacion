@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -44,6 +45,16 @@ namespace Vinculacion.Application.Services.ActorExternoService
             if (addActorEmpresaDto.Clasificaciones == null || !addActorEmpresaDto.Clasificaciones.Any())
             {
                 return OperationResult<AddActorEmpresaDto>.Failure("Debe seleccionar al menos una clasificación",null);
+            }
+
+            if (addActorEmpresaDto.TipoIdentificacion != 0)
+            {
+                bool validarIdentificacion = FuncionesService.ValidarIdentificacion(addActorEmpresaDto.TipoIdentificacion, addActorEmpresaDto.IdentificacionNumero);
+
+                if (validarIdentificacion)
+                {
+                    return OperationResult<AddActorEmpresaDto>.Failure("El no. de identificacion no es valido");
+                }
             }
 
             if (!await _paisRepository.PaisExists(addActorEmpresaDto.PaisID))

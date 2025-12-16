@@ -51,7 +51,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
             if(addActorPersonaDto.TipoIdentificacion != 0)
             { 
-                bool validarIdentificacion = ValidarIdentificacion(addActorPersonaDto.TipoIdentificacion, addActorPersonaDto.IdentificacionNumero);
+                bool validarIdentificacion = FuncionesService.ValidarIdentificacion(addActorPersonaDto.TipoIdentificacion, addActorPersonaDto.IdentificacionNumero);
 
                 if (validarIdentificacion) 
                 {
@@ -80,17 +80,6 @@ namespace Vinculacion.Application.Services.ActorExternoService
             var result = await _unitOfWork.SaveChangesAsync();
             return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", addActorPersonaDto);
         }
-
-        private bool ValidarIdentificacion(decimal? tipo, string? numero)
-        {
-            return tipo switch
-            {
-                (decimal)TipoIdentificacion.Cedula => FuncionesService.ValidateCedula(numero),
-                (decimal)TipoIdentificacion.Pasaporte => FuncionesService.ValidatePassaport(numero),
-                (decimal)TipoIdentificacion.RNC => FuncionesService.ValidateRNC(numero),
-                _ => false
-            };
-        } 
 
         public async Task<OperationResult<List<AddActorPersonaDto>>> GetActorPersonaAsync()
         {

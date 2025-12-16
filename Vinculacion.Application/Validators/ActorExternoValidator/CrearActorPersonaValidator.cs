@@ -34,6 +34,12 @@ namespace Vinculacion.Application.Validators.ActorExternoValidator
                 .WithMessage("El correo es obligatorio.")
                 .NotEqual("string");
 
+            RuleFor(x => x.Sexo)
+                .NotEmpty()
+                .WithMessage("El sexo de la persona es obligatorio")
+                .NotEmpty().WithMessage("El sexo de la persona es obligatorio")
+                .NotEqual(0).WithMessage("El sexo de la persona es obligatorio");
+
             When(x => x.TipoIdentificacion == 1, () =>
             {
                 RuleFor(x => x.IdentificacionNumero)
