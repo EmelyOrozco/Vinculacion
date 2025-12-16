@@ -7,9 +7,6 @@ namespace Vinculacion.Persistence.Context
     {
         public VinculacionContext(DbContextOptions<VinculacionContext> options) : base(options)
         {
-
-
-
         }
 
         public DbSet<TipoPersonaVinculacion> TipoPersonaVinculacion { get; set; }

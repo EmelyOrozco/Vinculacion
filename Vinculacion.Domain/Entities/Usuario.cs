@@ -8,7 +8,7 @@
 
         public decimal? EstadoId { get; set; }
 
-        public string NombreCompleto { get; set; }
+        public string? NombreCompleto { get; set; }
 
         public string? Cedula { get; set; }
 
