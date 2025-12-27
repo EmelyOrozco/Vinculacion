@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Vinculacion.API.Models;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 

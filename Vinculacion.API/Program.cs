@@ -33,6 +33,9 @@ using Vinculacion.Persistence.Context;
 using Vinculacion.Persistence.Repositories;
 using Vinculacion.Application.Validators.UsuariosSistemaValidator;
 using Vinculacion.Application.Dtos.UsuarioSistemaDto;
+using Vinculacion.Application.Interfaces.Repositories.CatalogoRepository;
+using Vinculacion.Application.Interfaces.Services.ICatalogoService;
+using Vinculacion.Application.Services.CatalogoService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -85,7 +88,14 @@ builder.Services.AddScoped<IValidator<UsersAddDto>, UsersValidator>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
-        builder.Services.AddAuthentication(options =>
+builder.Services.AddScoped<IRecintoRepository, RecintoRepository>();
+builder.Services.AddScoped<IFacultadRepository, FacultadRepository>();
+builder.Services.AddScoped<IEscuelaRepository, EscuelaRepository>();
+builder.Services.AddScoped<ICarreraRepository, CarreraRepository>();
+
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+
+builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -148,6 +158,19 @@ builder.Services.AddSwaggerGen(options =>
         Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin() 
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+
 
 var app = builder.Build();
 
@@ -159,11 +182,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowFrontend");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

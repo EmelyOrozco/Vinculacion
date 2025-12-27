@@ -29,6 +29,11 @@ namespace Vinculacion.Persistence.Context
         public DbSet<Usuario> Usuario { get; set; }
 
         public DbSet<ProyectoActividad> ProyectoActividad { get; set; }
+        public DbSet<Recinto> Recintos { get; set; }
+        public DbSet<Facultad> Facultades { get; set; }
+        public DbSet<Escuela> Escuelas { get; set; }
+        public DbSet<Carrera> Carreras { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -140,6 +145,12 @@ namespace Vinculacion.Persistence.Context
                     .HasForeignKey(e => e.ActividadID)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            modelBuilder.Entity<Recinto>().ToTable("Recinto").HasKey(x => x.RecintoID);
+            modelBuilder.Entity<Facultad>().ToTable("Facultad").HasKey(x => x.FacultadID);
+            modelBuilder.Entity<Escuela>().ToTable("Escuela").HasKey(x => x.EscuelaID);
+            modelBuilder.Entity<Carrera>().ToTable("Carrera").HasKey(x => x.CarreraID);
+
 
         }
 
