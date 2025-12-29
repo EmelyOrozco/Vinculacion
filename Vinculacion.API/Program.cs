@@ -36,7 +36,10 @@ using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 using Vinculacion.Application.Interfaces.Repositories.CatalogoRepository;
 using Vinculacion.Application.Interfaces.Services.ICatalogoService;
 using Vinculacion.Application.Services.CatalogoService;
-
+using Vinculacion.Application.Interfaces.Repositories.DocumentoAdjuntoRepository;
+using Vinculacion.Application.Interfaces.Services.IFileStorageService;
+using Vinculacion.API.Services;
+using Vinculacion.Application.Services.DocumentoAdjuntoService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +97,9 @@ builder.Services.AddScoped<IEscuelaRepository, EscuelaRepository>();
 builder.Services.AddScoped<ICarreraRepository, CarreraRepository>();
 
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+builder.Services.AddScoped<IDocumentoAdjuntoRepository, DocumentoAdjuntoRepository>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IDocumentoAdjuntoService, DocumentoAdjuntoService>();
 
 builder.Services.AddAuthentication(options =>
         {
@@ -175,6 +181,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseGlobalExceptionHandler();
+
+app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {

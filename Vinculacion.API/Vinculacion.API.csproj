@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Vinculacion.Persistence\Vinculacion.Persistence.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
