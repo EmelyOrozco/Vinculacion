@@ -37,6 +37,12 @@ namespace Vinculacion.Persistence.Context
         public DbSet<Subida> Subida { get; set; }
 
         public DbSet<SubidaDetalle> SubidaDetalle { get; set; }
+        public DbSet<Recinto> Recintos { get; set; }
+        public DbSet<Facultad> Facultades { get; set; }
+        public DbSet<Escuela> Escuelas { get; set; }
+        public DbSet<Carrera> Carreras { get; set; }
+        public DbSet<DocumentoAdjunto> DocumentoAdjunto { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -156,6 +162,13 @@ namespace Vinculacion.Persistence.Context
             modelBuilder.Entity<Subida>().HasKey(e => e.SubidaId);
 
             modelBuilder.Entity<SubidaDetalle>().HasKey(e => e.SubidaId);
+            modelBuilder.Entity<Recinto>().ToTable("Recinto").HasKey(x => x.RecintoID);
+            modelBuilder.Entity<Facultad>().ToTable("Facultad").HasKey(x => x.FacultadID);
+            modelBuilder.Entity<Escuela>().ToTable("Escuela").HasKey(x => x.EscuelaID);
+            modelBuilder.Entity<Carrera>().ToTable("Carrera").HasKey(x => x.CarreraID);
+
+            modelBuilder.Entity<DocumentoAdjunto>().ToTable("DocumentoAdjunto").HasKey(x => x.DocumentoAdjuntoID);
+            modelBuilder.Entity<DocumentoAdjunto>().Property(x => x.DocumentoAdjuntoID).ValueGeneratedOnAdd();
         }
 
     }
