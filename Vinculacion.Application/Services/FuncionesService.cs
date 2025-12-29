@@ -5,6 +5,12 @@ namespace Vinculacion.Application.Services
 {
     public static class FuncionesService
     {
+        private static readonly string[] ExcelSignatures =
+        {
+            "D0CF11E0", // .xls
+            "504B0304"  // .xlsx
+        };
+
         public static bool ValidarIdentificacion(decimal? tipo, string? numero)
         {
             return tipo switch
@@ -99,6 +105,20 @@ namespace Vinculacion.Application.Services
                 return false;
 
             return true;
+        }
+
+
+        public static async Task<bool> IsExcelAsync( Stream stream, CancellationToken cancellationToken)
+        {
+            var header = new byte[4];
+
+            stream.Position = 0;
+            await stream.ReadExactlyAsync(header.AsMemory(0, 4), cancellationToken);
+            stream.Position = 0;
+
+            var hex = Convert.ToHexString(header);
+
+            return ExcelSignatures.Any(sig => hex.StartsWith(sig));
         }
     }
 }

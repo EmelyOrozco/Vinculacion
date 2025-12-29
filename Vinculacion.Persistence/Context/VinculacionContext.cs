@@ -1,12 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Vinculacion.Domain.Entities;
 
 namespace Vinculacion.Persistence.Context
 {
     public class VinculacionContext : DbContext
     {
-        public VinculacionContext(DbContextOptions<VinculacionContext> options) : base(options)
+        private readonly IHttpContextAccessor _httpContext;
+        public VinculacionContext(DbContextOptions<VinculacionContext> options, IHttpContextAccessor httpContext) : base(options)
         {
+            _httpContext = httpContext;
         }
 
         public DbSet<TipoPersonaVinculacion> TipoPersonaVinculacion { get; set; }
@@ -28,7 +31,12 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<Usuario> Usuario { get; set; }
 
+        public DbSet<Auditoria> Auditoria { get; set; }
         public DbSet<ProyectoActividad> ProyectoActividad { get; set; }
+
+        public DbSet<Subida> Subida { get; set; }
+
+        public DbSet<SubidaDetalle> SubidaDetalle { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -141,6 +149,13 @@ namespace Vinculacion.Persistence.Context
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+
+            modelBuilder.Entity<Auditoria>()
+               .HasKey(e =>  e.AuditoriaID );
+
+            modelBuilder.Entity<Subida>().HasKey(e => e.SubidaId);
+
+            modelBuilder.Entity<SubidaDetalle>().HasKey(e => e.SubidaId);
         }
 
     }

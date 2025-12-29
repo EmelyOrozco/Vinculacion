@@ -27,9 +27,9 @@ namespace Vinculacion.Persistence.Repositories
                 .FirstOrDefaultAsync(e => e.ActorExternoID == id);
         }
 
-        public async Task<ActorEmpresa?> ActorEmpresaExistsAsync (string identificacionNumero, string NombreEmpresa)
+        public async Task<bool> ActorEmpresaExistsAsync (string identificacionNumero, string NombreEmpresa)
         {
-            return await _context.ActorEmpresa.FirstOrDefaultAsync(x => x.IdentificacionNumero == identificacionNumero);
+            return await _context.ActorEmpresa.AnyAsync(x => x.IdentificacionNumero == identificacionNumero);
         }
 
     }
