@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Domain.Constants;
 using Vinculacion.Persistence.Base;
