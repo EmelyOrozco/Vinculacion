@@ -18,7 +18,7 @@ namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculaci
 
         public string? TelefonoContacto { get; set; }
 
-        public decimal? TipoRelacion { get; set; }
+        public string? TipoRelacion { get; set; }
 
         public string? Matricula { get; set; }
 

@@ -64,11 +64,14 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             if (!result.IsSuccess || result.Data == null)
                 return OperationResult<PersonaVinculacionDto>.Failure("Persona vinculada no encontrada");
 
+            PersonaVinculacion entity = (PersonaVinculacion)result.Data;
+
             return OperationResult<PersonaVinculacionDto>.Success(
                 "Persona vinculada encontrada",
-                result.Data.ToPersonaVinculacionDto()
+                entity.ToPersonaVinculacionDto()
             );
         }
+
 
         public async Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionDto dto)
         {
@@ -100,8 +103,8 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             if (!string.IsNullOrWhiteSpace(dto.TelefonoContacto))
                 entity.TelefonoContacto = dto.TelefonoContacto;
 
-            if (dto.TipoRelacion.HasValue && dto.TipoRelacion > 0)
-                entity.TipoRelacion = dto.TipoRelacion.Value;
+            if (!string.IsNullOrWhiteSpace(dto.TipoRelacion))
+                entity.TipoRelacion = dto.TipoRelacion;
 
             if (!string.IsNullOrWhiteSpace(dto.Matricula))
                 entity.Matricula = dto.Matricula;
