@@ -36,6 +36,13 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
         public async Task<OperationResult<AddActorEmpresaDto>> AddActorEmpresaAsync(AddActorEmpresaDto addActorEmpresaDto)
         {
+            bool actorEmpresaExists = await _actorEmpresaRepository.ActorEmpresaExistsAsync(addActorEmpresaDto.IdentificacionNumero, addActorEmpresaDto.NombreEmpresa);
+
+            if (actorEmpresaExists)  
+            {
+                return OperationResult<AddActorEmpresaDto>.Failure("Esta empresa se encuentra registrada");
+            }
+
             var validationActorEmpresa = await _validator.ValidateAsync(addActorEmpresaDto);
             if (!validationActorEmpresa.IsValid)
             {

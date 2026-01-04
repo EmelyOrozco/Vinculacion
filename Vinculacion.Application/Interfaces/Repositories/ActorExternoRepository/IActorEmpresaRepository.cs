@@ -6,5 +6,6 @@ namespace Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository
     {
         Task<List<ActorEmpresa>> GetAllWithClasificacionesAsync();
         Task<ActorEmpresa?> GetByIdWithClasificacionesAsync(decimal id);
+        Task<bool> ActorEmpresaExistsAsync(string identificacionNumero, string NombreEmpresa);
     }
 }

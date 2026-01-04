@@ -36,7 +36,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
 
         public async Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto)
         {
-            var existenciaActor = await _actorPersonaRepository.ActorPersonaExists(addActorPersonaDto.IdentificacionNumero);
+            bool existenciaActor = await _actorPersonaRepository.ActorPersonaExists(addActorPersonaDto.IdentificacionNumero);
 
             if (existenciaActor)
             {
@@ -58,6 +58,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
                     return OperationResult<AddActorPersonaDto>.Failure("El no. de identificacion no es valido");
                 }
             }
+
             if (!await _paisRepository.PaisExists(addActorPersonaDto.PaisID))
             {
                 return OperationResult<AddActorPersonaDto>.Failure("El país seleccionado no existe", null);

@@ -40,6 +40,7 @@ using Vinculacion.Application.Interfaces.Repositories.DocumentoAdjuntoRepository
 using Vinculacion.Application.Interfaces.Services.IFileStorageService;
 using Vinculacion.API.Services;
 using Vinculacion.Application.Services.DocumentoAdjuntoService;
+using Vinculacion.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,16 +78,25 @@ builder.Services.AddScoped<IProyectoActividadRepository, ProyectoActividadReposi
 builder.Services.AddScoped<IValidator<UpdateProyectoDto>, UpdateProyectoValidator>();
 builder.Services.AddTransient<IProyectoService, ProyectoService>();
 builder.Services.AddScoped<IValidator<AddActividadesToProyectoDto>,AddActividadesToProyectoDtoValidator>();
+builder.Services.AddScoped<IValidator<AddActorEmpresaDto>, AddActorEmpresaDtoValidator>();
 
 
 builder.Services.AddScoped<IValidator<AddProyectoDto>, AddProyectoValidator>();
 
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<ISubidaRepository, SubidaRepository>();
+builder.Services.AddTransient<ISubidaService, SubidaService>();
+
+builder.Services.AddScoped<ISubidaDetalleRepository, SubidaDetalleRepository>();
+builder.Services.AddScoped<IQueryRepository, QueryRepository>();
 
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IValidator<UsersAddDto>, UsersValidator>();
+
 
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
@@ -154,6 +164,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
