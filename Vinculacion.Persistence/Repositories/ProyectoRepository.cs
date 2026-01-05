@@ -26,5 +26,17 @@ namespace Vinculacion.Persistence.Repositories
                 .Include(p => p.ProyectoActividades)
                 .FirstOrDefaultAsync(p => p.ProyectoID == proyectoId);
         }
+
+        public async Task<List<ProyectoVinculacion>> GetProyectosEstatusActivo()
+        {
+            var proyectosActivos = await _context.ProyectoVinculacion.Join(_context.Estado, p => p.EstadoID, e => e.EstadoID, (p, e) => new { Proyecto = p, Estado = e })
+             .Where(x =>
+                     x.Estado.TablaEstado == "ProyectoVinculacion" &&
+                     x.Estado.Descripcion == "Activo")
+             .Select(x => x.Proyecto)
+             .ToListAsync();
+
+            return proyectosActivos;
+        }
     }
 }

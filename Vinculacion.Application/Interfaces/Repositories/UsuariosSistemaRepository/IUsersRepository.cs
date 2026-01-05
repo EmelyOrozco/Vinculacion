@@ -8,5 +8,7 @@ namespace Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaReposit
         Task<Usuario?> UsuadioById(decimal id);
 
         Task<Usuario?> ValidarExistenciaUsuario(string cedula, string codigoEmpleado);
+
+        Task<List<Usuario>> GetCorreoUsuariosAlertas();
     }
 }

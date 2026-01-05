@@ -9,5 +9,7 @@ namespace Vinculacion.Application.Interfaces.Services.IActividadVinculacionServi
         Task<OperationResult<List<ActividadVinculacionDto>>> GetAllAsync();
         Task<OperationResult<ActividadVinculacionDto>> GetByIdAsync(decimal id);
         Task<OperationResult<bool>> UpdateAsync(decimal id, ActividadVinculacionDto dto);
+
+        Task ProcesarActividadesAsync(DateTime hoy);
     }
 }

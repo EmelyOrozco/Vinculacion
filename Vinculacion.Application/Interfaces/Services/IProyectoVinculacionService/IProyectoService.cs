@@ -15,5 +15,7 @@ namespace Vinculacion.Application.Interfaces.Services.IProyectoVinculacionServic
         Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId,AddActividadesToProyectoDto dto);
         Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesByProyectoAsync(decimal proyectoId);
         Task<OperationResult<List<ActividadVinculacionDto>>> GetActividadesDisponiblesAsync();
+
+        Task ProcesarProyectosAsync(DateTime hoy);
     }
 }
