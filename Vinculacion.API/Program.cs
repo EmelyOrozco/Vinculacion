@@ -111,6 +111,9 @@ builder.Services.AddScoped<IDocumentoAdjuntoRepository, DocumentoAdjuntoReposito
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IDocumentoAdjuntoService, DocumentoAdjuntoService>();
 
+builder.Services.AddScoped<IEstadoService, EstadoService>();
+builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
+
 builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

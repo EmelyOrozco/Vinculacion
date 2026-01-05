@@ -42,6 +42,7 @@ namespace Vinculacion.Persistence.Context
         public DbSet<Escuela> Escuelas { get; set; }
         public DbSet<Carrera> Carreras { get; set; }
         public DbSet<DocumentoAdjunto> DocumentoAdjunto { get; set; }
+        public DbSet<Estado> Estado { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -169,6 +170,20 @@ namespace Vinculacion.Persistence.Context
 
             modelBuilder.Entity<DocumentoAdjunto>().ToTable("DocumentoAdjunto").HasKey(x => x.DocumentoAdjuntoID);
             modelBuilder.Entity<DocumentoAdjunto>().Property(x => x.DocumentoAdjuntoID).ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Estado>(entity =>
+            {
+                entity.ToTable("Estado");
+                entity.HasKey(e => new { e.EstadoID, e.TablaEstado });
+
+                entity.Property(e => e.Descripcion)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(e => e.TablaEstado)
+                      .IsRequired()
+                      .HasMaxLength(100);
+            });
         }
 
     }
