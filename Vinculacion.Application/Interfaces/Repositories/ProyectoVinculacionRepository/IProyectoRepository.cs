@@ -6,5 +6,6 @@ namespace Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRep
     {
         Task<List<ProyectoVinculacion>> GetAllWithActividadesAsync();
         Task<ProyectoVinculacion?> GetByIdWithActividadesAsync(decimal proyectoId);
+        Task<List<ProyectoVinculacion>> GetProyectosEstatusActivo();
     }
 }

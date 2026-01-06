@@ -53,5 +53,17 @@ namespace Vinculacion.Persistence.Repositories
             return OperationResult<ActividadVinculacion>.Success("OK", data);
         }
 
+        public async Task<List<ActividadVinculacion>> GetActividadEstatusActivo()
+        {
+            var actividadesActivas = await _context.ActividadVinculacion.Join(_context.Estado, p => p.EstadoId, e => e.EstadoID, (p, e) => new { Actividad = p, Estado = e })
+             .Where(x =>
+                     x.Estado.TablaEstado == "ActividadVinculacion" &&
+                     x.Estado.Descripcion == "Activo")
+             .Select(x => x.Actividad)
+             .ToListAsync();
+
+            return actividadesActivas;
+        }
+
     }
 }

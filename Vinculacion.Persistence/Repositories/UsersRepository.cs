@@ -28,5 +28,15 @@ namespace Vinculacion.Persistence.Repositories
             return await _context.Usuario.FirstOrDefaultAsync(x => x.Cedula == cedula || x.CodigoEmpleado == codigoEmpleado);
         }
 
+        public async Task<List<Usuario>> GetCorreoUsuariosAlertas()
+        { 
+            var usuarios = await _context.Usuario
+                .Include(u => u.rol)
+                .Where(u => u.rol.Descripcion == "Superusuario" || u.rol.Descripcion == "Usuario Final")
+                .ToListAsync();
+
+            return usuarios;
+        }
+
     }
 }

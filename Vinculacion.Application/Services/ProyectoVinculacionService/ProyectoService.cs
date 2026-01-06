@@ -1,10 +1,17 @@
-﻿using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
-using Vinculacion.Application.Extentions.ProyectoVinculacionExtentions;
-using Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRepository;
-using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
-using Vinculacion.Domain.Base;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation;
+using System.Formats.Asn1;
+using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
+using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
+using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
+using Vinculacion.Application.Extentions.ProyectoVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
+using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
+using Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRepository;
+using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
+using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
+using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
+using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
@@ -24,6 +31,8 @@ namespace Vinculacion.Application.Services
         private readonly IActividadVinculacionRepository _actividadRepository;
         private readonly IProyectoActividadRepository _proyectoActividadRepository;
         private readonly IValidator<AddActividadesToProyectoDto> _addActividadesValidator;
+        private readonly IUsersRepository _usersRepository;
+        private readonly IEmailService _emailService;
 
         public ProyectoService(
             IProyectoRepository proyectoRepository,
@@ -32,7 +41,9 @@ namespace Vinculacion.Application.Services
             IValidator<UpdateProyectoDto> updateValidator,
             IActividadVinculacionRepository actividadRepository,
             IProyectoActividadRepository proyectoActividadRepository,
-            IValidator<AddActividadesToProyectoDto> addActividadesValidator)
+            IValidator<AddActividadesToProyectoDto> addActividadesValidator,
+            IUsersRepository usersRepository,
+            IEmailService emailService)
         {
             _proyectoRepository = proyectoRepository;
             _validator = validator;
@@ -41,6 +52,8 @@ namespace Vinculacion.Application.Services
             _actividadRepository = actividadRepository;
             _proyectoActividadRepository = proyectoActividadRepository;
             _addActividadesValidator = addActividadesValidator;
+            _usersRepository = usersRepository;
+            _emailService = emailService;
         }
 
         public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request, decimal usuarioId)
@@ -342,6 +355,70 @@ namespace Vinculacion.Application.Services
                 return OperationResult<List<ActividadVinculacionDto>>.Success("No hay actividades disponibles para asociar a proyectos", actividades);
             }
             return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
+        }
+
+
+        public async Task ProcesarProyectosAsync(DateTime hoy)
+        {
+            var proyectos = await _proyectoRepository.GetProyectosEstatusActivo();
+
+            foreach (var proyecto in proyectos)
+            {
+                double? diasFaltantes = null;
+
+                if (proyecto.FechaFin.HasValue)
+                {
+                    diasFaltantes = (proyecto.FechaFin.Value - hoy).TotalDays;
+                }
+
+                if (!FuncionesService.DebeNotificar(diasFaltantes))
+                    continue;
+
+                var titulo = FuncionesService.ObtenerTitulo("Proyecto", diasFaltantes);
+                var body = $@"
+                        <html>
+                        <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                            <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                                <h2 style='color:#333;'>🔔 Proyecto próximo a vencer</h2>
+
+                                <p>Hola,</p>
+
+                                <p>
+                                    Te informamos que el proyecto 
+                                    <strong>{proyecto.TituloProyecto}</strong> tiene como fecha de finalización:
+                                </p>
+
+                                <p style='font-size:16px;'>
+                                    📅 <strong>{proyecto.FechaFin:dd/MM/yyyy}</strong>
+                                </p>
+
+                                <p>
+                                    Por favor, revisa el estado del proyecto y realiza las acciones correspondientes.
+                                </p>
+
+                                <hr />
+
+                                <p style='font-size:12px; color:#777;'>
+                                    Sistema de Vinculación Universitaria<br/>
+                                    UNPHU
+                                </p>
+                            </div>
+                        </body>
+                        </html>";
+
+                var mensaje = $"El proyecto {proyecto.TituloProyecto} vence el {proyecto.FechaFin: dd/MM/yyyy}";
+
+                var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+
+                foreach (var usuario in correoUsuarios)
+                {
+                    if (!string.IsNullOrWhiteSpace(usuario.CorreoInstitucional))
+                    {
+                        await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                    }
+                }
+
+            }
         }
     }
 }

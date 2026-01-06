@@ -120,5 +120,23 @@ namespace Vinculacion.Application.Services
 
             return ExcelSignatures.Any(sig => hex.StartsWith(sig));
         }
+
+        public static bool DebeNotificar(double? dias)
+        {
+            return dias == 7 || dias == 3 || dias == 14 || dias < 0;
+        }
+
+        public static string ObtenerTitulo(string tipo, double? dias)
+        {
+            if (dias < 0)
+                return $"{tipo} vencido";
+
+            if (dias == 3)
+                return $"{tipo} próximo a vencer (urgente)";
+
+            return $"{tipo} próximo a vencer";
+        }
+
+
     }
 }

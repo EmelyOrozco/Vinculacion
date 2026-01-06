@@ -23,5 +23,6 @@ namespace Vinculacion.Persistence.Repositories
             return await _context.Set<ProyectoActividad>()
                 .CountAsync(x => x.ProyectoID == proyectoId);
         }
+
     }
 }

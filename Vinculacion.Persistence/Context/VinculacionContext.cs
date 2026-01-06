@@ -44,6 +44,10 @@ namespace Vinculacion.Persistence.Context
         public DbSet<DocumentoAdjunto> DocumentoAdjunto { get; set; }
         public DbSet<Estado> Estado { get; set; }
 
+        public DbSet<Rol> Rol { get; set; }
+
+        public DbSet<ProyectoVinculacion> ProyectoVinculacion { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

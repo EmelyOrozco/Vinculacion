@@ -3,7 +3,9 @@ using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
+using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
+using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
 
@@ -13,11 +15,18 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
     {
         private readonly IActividadVinculacionRepository _actividadVinculacionRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUsersRepository _usersRepository;
+        private readonly IEmailService _emailService;
         
-        public ActividadVinculacionService(IActividadVinculacionRepository actividadVinculacionRepository, IUnitOfWork unitOfWork)
+        public ActividadVinculacionService(IActividadVinculacionRepository actividadVinculacionRepository,
+            IUnitOfWork unitOfWork,
+            IUsersRepository usersRepository,
+            IEmailService emailService)
         {
             _actividadVinculacionRepository = actividadVinculacionRepository;
             _unitOfWork = unitOfWork;
+            _usersRepository = usersRepository;
+            _emailService = emailService;
         }
 
         public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto actividadVinculacionDto, decimal usuarioId)
@@ -210,6 +219,68 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success("Actividad actualizada correctamente", true);
+        }
+
+
+        public async Task ProcesarActividadesAsync(DateTime hoy)
+        {
+            var actividades = await _actividadVinculacionRepository.GetActividadEstatusActivo();
+
+            foreach(var actividad in actividades)
+            {
+                double? diasFaltantes = null;
+
+                if (actividad.FechaHoraEvento.HasValue)
+                {
+                    diasFaltantes = (actividad.FechaHoraEvento.Value - hoy).TotalDays;
+                }
+
+                if (!FuncionesService.DebeNotificar(diasFaltantes))
+                    continue;
+
+                var titulo = FuncionesService.ObtenerTitulo("Actividad", diasFaltantes);
+                var body = $@"
+                <html>
+                <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                    <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                        <h2 style='color:#333;'>🔔 Actividad próxima a vencer</h2>
+
+                        <p>Hola,</p>
+
+                        <p>
+                            Te informamos que la actividad 
+                            <strong>{actividad.TituloActividad}</strong> tiene como fecha de finalización:
+                        </p>
+
+                        <p style='font-size:16px;'>
+                            📅 <strong>{actividad.FechaHoraEvento:dd/MM/yyyy}</strong>
+                        </p>
+
+                        <p>
+                            Por favor, revisa el estado de la actividad y realiza las acciones correspondientes.
+                        </p>
+
+                        <hr />
+
+                        <p style='font-size:12px; color:#777;'>
+                            Sistema de Vinculación Universitaria<br/>
+                            UNPHU
+                        </p>
+                    </div>
+                </body>
+                </html>";
+
+                var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+
+                foreach (var usuario in correoUsuarios)
+                {
+                    if (!string.IsNullOrWhiteSpace(usuario.CorreoInstitucional))
+                    {
+                        await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                    }
+                }
+
+            }
         }
     }
 }
