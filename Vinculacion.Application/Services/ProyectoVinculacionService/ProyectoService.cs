@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using FluentValidation;
-using System.Formats.Asn1;
+﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
@@ -13,12 +11,7 @@ using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
-using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
-using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
-using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
-using DocumentFormat.OpenXml.Vml.Office;
 using System.Text.Json;
-using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Vinculacion.Application.Services
 {
