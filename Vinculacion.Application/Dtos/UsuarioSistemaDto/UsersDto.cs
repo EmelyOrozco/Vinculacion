@@ -2,6 +2,7 @@
 {
     public class UsersDto
     {
+        public decimal UsuarioId { get; set; }
         public decimal? Idrol { get; set; }
 
         public decimal? EstadoId { get; set; }

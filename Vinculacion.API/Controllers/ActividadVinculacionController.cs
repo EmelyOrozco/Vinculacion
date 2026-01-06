@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
+using System.Security.Claims;
 
 namespace Vinculacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActividadVinculacionController : ControllerBase
+    public class ActividadVinculacionController : BaseController
     {
         private readonly IActividadVinculacionService _actividadVinculacionService;
         public ActividadVinculacionController(IActividadVinculacionService actividadVinculacionService)
@@ -16,11 +17,13 @@ namespace Vinculacion.API.Controllers
             _actividadVinculacionService = actividadVinculacionService;
         }
 
+
         [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ActividadVinculacionDto actividadVinculacionDto)
         {
-            var result = await _actividadVinculacionService.AddActividadVinculacion(actividadVinculacionDto);
+            var usuarioId = UsuarioId;
+            var result = await _actividadVinculacionService.AddActividadVinculacion(actividadVinculacionDto, usuarioId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
@@ -56,7 +59,8 @@ namespace Vinculacion.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(decimal id, [FromBody] ActividadVinculacionDto dto)
         {
-            var result = await _actividadVinculacionService.UpdateAsync(id, dto);
+            var usuarioId = UsuarioId;
+            var result = await _actividadVinculacionService.UpdateAsync(id, dto, usuarioId);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Message);

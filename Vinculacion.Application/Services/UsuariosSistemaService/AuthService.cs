@@ -35,6 +35,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
 
             var claims = new[]
             {
+                new Claim("UsuarioID", user.UsuarioId.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Usuario),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Usuario),
                 new Claim(JwtRegisteredClaimNames.Email, user.CorreoInstitucional),

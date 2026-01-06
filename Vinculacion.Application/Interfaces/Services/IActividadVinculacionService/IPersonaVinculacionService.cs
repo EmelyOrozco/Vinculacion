@@ -5,9 +5,9 @@ namespace Vinculacion.Application.Interfaces.Services.IActividadVinculacionServi
 {
     public interface IPersonaVinculacionService
     {
-        Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto request);
+        Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto request, decimal usuarioId);
         Task<OperationResult<List<PersonaVinculacionDto>>> GetAllAsync();
         Task<OperationResult<PersonaVinculacionDto>> GetByIdAsync(decimal id);
-        Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionDto dto);
+        Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionUpdateDto dto, decimal usuarioId);
     }
 }

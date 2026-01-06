@@ -7,7 +7,7 @@ using Vinculacion.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Vinculacion.Application.Interfaces.Repositories;
 using FluentValidation;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 
 namespace Vinculacion.Application.Services.UsuariosSistemaService
 {
@@ -53,7 +53,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             return OperationResult<UsersAddDto>.Success("Usuario obtenido correctamente", userDto);
         }
 
-        public async Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto)
+        public async Task<OperationResult<UsersAddDto>> AddUserAsync(UsersAddDto usersDto, decimal usuarioId)
         {
             var existenciaUsuario = await _usersRepository.ValidarExistenciaUsuario(usersDto.Cedula, usersDto.CodigoEmpleado);
 
@@ -92,6 +92,14 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             usuarioEntity.PasswordHash = _passwordHasher.HashPassword(usuarioEntity, claveGenerada);
 
             await _usersRepository.AddAsync(usuarioEntity);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "Usuario",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             await _emailService.SendEmail(usersDto.CorreoInstitucional,
@@ -144,7 +152,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             return OperationResult<UsersAddDto>.Success("Usuario obtenido exitosamente", userid.Data);
         }
 
-        public async Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id)
+        public async Task<OperationResult<UsersUpdateDto>> UpdateUserAsync(UsersUpdateDto usersUpdateDto, decimal id, decimal usuarioId)
         {
             var usuario = await _usersRepository.UsuadioById(id);
 
@@ -153,8 +161,12 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return OperationResult<UsersUpdateDto>.Failure("Usuario no encontrado");
             }
 
-            var entity = usersUpdateDto.ToUsuarioFromUpdateDto();
-            entity.UsuarioId = id;
+            var antes = JsonSerializer.Serialize(new
+            {
+                usuario.UsuarioId,
+                usuario.Idrol,
+                usuario.EstadoId
+            });
 
             if (usersUpdateDto.Idrol.HasValue && usersUpdateDto.Idrol.Value > 0)
             {
@@ -174,6 +186,24 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             usuario.FechaModificacion = DateTime.Now;
 
             var usuarioeditado = await _usersRepository.Update(usuario);
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                usuario.UsuarioId,
+                usuario.Idrol,
+                usuario.EstadoId
+            });
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "Usuario",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
             await _unitOfWork.SaveChangesAsync();
 
             if (!usuarioeditado.IsSuccess)
@@ -198,7 +228,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             return usuario;
         }
 
-        public async Task<OperationResult<bool>> UpdateUserRolAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        public async Task<OperationResult<bool>> UpdateUserRolAsync(decimal id, UsersUpdateRolDto usersUpdateDto, decimal usuarioId)
         {
             if (!usersUpdateDto.Idrol.HasValue || usersUpdateDto.Idrol.Value <= 0)
             {
@@ -212,10 +242,22 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return OperationResult<bool>.Failure("Usuario no encontrado");
             }
 
+            var antes = $"Rol anterior: {usuario.Idrol}";
+
             usuario.Idrol = usersUpdateDto.Idrol;
             usuario.FechaModificacion = DateTime.Now;
 
             var usuarioeditado = await _usersRepository.Update(usuario);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar Rol",
+                Entidad = "Usuario",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = $"Nuevo rol: {usersUpdateDto.Idrol.Value}"
+            });
             await _unitOfWork.SaveChangesAsync();
 
             if (!usuarioeditado.IsSuccess)
@@ -228,7 +270,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             }
         }
 
-        public async Task<OperationResult<bool>> UpdateUserStateAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        public async Task<OperationResult<bool>> UpdateUserStateAsync(decimal id, UsersUpdateStateDto usersUpdateDto, decimal usuarioId)
         {
             if (!usersUpdateDto.EstadoId.HasValue || usersUpdateDto.EstadoId.Value <= 0)
             {
@@ -242,10 +284,22 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return OperationResult<bool>.Failure("Usuario no encontrado");
             }
 
+            var antes = $"Estado anterior: {usuario.EstadoId}";
+
             usuario.EstadoId = usersUpdateDto.EstadoId;
             usuario.FechaModificacion = DateTime.Now;
 
             var estadoeditado = await _usersRepository.Update(usuario);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar Estado",
+                Entidad = "Usuario",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = $"Nuevo estado: {usersUpdateDto.EstadoId.Value}"
+            });
             await _unitOfWork.SaveChangesAsync();
 
             if (!estadoeditado.IsSuccess)
@@ -258,7 +312,7 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             }  
         }
 
-        public async Task<OperationResult<bool>> UpdateUserPasswordAsync(decimal id, UsersUpdateDto usersUpdateDto)
+        public async Task<OperationResult<bool>> UpdateUserPasswordAsync(decimal id, UsersUpdatePassDto usersUpdateDto, decimal usuarioId)
         {
             if (string.IsNullOrWhiteSpace(usersUpdateDto.PasswordHash))
                 return OperationResult<bool>.Failure("La contraseña es requerida");
@@ -275,6 +329,16 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
             usuario.FechaModificacion = DateTime.Now;
 
             var passwordedited = await _usersRepository.Update(usuario);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar Contraseña",
+                Entidad = "Usuario",
+                EntidadId = id,
+                DetalleAntes = null,
+                DetalleDespues = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             if (!passwordedited.IsSuccess)
@@ -286,6 +350,5 @@ namespace Vinculacion.Application.Services.UsuariosSistemaService
                 return OperationResult<bool>.Success("Usuario Actualizado correctamente", true);
             }
         }
-
     }
 }

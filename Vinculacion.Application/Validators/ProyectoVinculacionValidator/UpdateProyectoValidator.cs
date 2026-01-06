@@ -9,12 +9,31 @@ namespace Vinculacion.Application.Validators.ProyectoVinculacionValidator
         {
             RuleFor(x => x.TituloProyecto)
                 .NotEmpty()
-                .WithMessage("El título del proyecto es obligatorio");
+                .When(x => x.TituloProyecto != null);
 
-            RuleFor(x => x.FechaFin)
-                .GreaterThanOrEqualTo(x => x.FechaInicio)
-                .When(x => x.FechaInicio.HasValue && x.FechaFin.HasValue)
-                .WithMessage("La fecha de fin no puede ser menor que la de inicio");
+            RuleFor(x => x.DescripcionGeneral)
+                .NotEmpty()
+                .When(x => x.DescripcionGeneral != null);
+
+            RuleFor(x => x.FechaInicio)
+                .LessThan(x => x.FechaFin)
+                .When(x => x.FechaInicio.HasValue && x.FechaFin.HasValue);
+
+            RuleFor(x => x.Ambito)
+                .GreaterThan(0)
+                .When(x => x.Ambito.HasValue);
+
+            RuleFor(x => x.Sector)
+                .GreaterThan(0)
+                .When(x => x.Sector.HasValue);
+
+            RuleFor(x => x.PersonaID)
+                .GreaterThan(0)
+                .When(x => x.PersonaID.HasValue);
+
+            RuleFor(x => x.RecintoID)
+                .GreaterThan(0)
+                .When(x => x.RecintoID.HasValue);
         }
     }
 }

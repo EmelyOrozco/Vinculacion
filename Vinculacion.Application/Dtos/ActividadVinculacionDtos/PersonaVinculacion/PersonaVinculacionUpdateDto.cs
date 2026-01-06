@@ -1,6 +1,6 @@
 ﻿namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion
 {
-    public record class PersonaVinculacionDto
+    public record class PersonaVinculacionUpdateDto
     {
 
         public decimal? TipoPersonaID { get; set; }
@@ -11,7 +11,7 @@
 
         public decimal? CarreraID { get; set; }
 
-        public string NombreCompleto { get; set; }
+        public string? NombreCompleto { get; set; }
 
         public string? Correo { get; set; }
 

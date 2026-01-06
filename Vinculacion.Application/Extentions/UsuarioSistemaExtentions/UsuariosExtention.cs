@@ -9,6 +9,7 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
         {
             return new UsersDto
             {
+                UsuarioId = usuario.UsuarioId,
                 Usuario = usuario.CodigoEmpleado,
                 Password = usuario.PasswordHash,
                 Idrol = usuario.Idrol,

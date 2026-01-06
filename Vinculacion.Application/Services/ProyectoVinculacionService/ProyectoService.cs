@@ -9,6 +9,9 @@ using Vinculacion.Domain.Entities;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
+using DocumentFormat.OpenXml.Vml.Office;
+using System.Text.Json;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Vinculacion.Application.Services
 {
@@ -40,7 +43,7 @@ namespace Vinculacion.Application.Services
             _addActividadesValidator = addActividadesValidator;
         }
 
-        public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request)
+        public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request, decimal usuarioId)
         {
             var validation = await _validator.ValidateAsync(request);
             if (!validation.IsValid)
@@ -53,6 +56,14 @@ namespace Vinculacion.Application.Services
             var entity = request.ToProyectoFromAddDto();
 
             await _proyectoRepository.AddAsync(entity);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ProyectoVinculacion",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<AddProyectoDto>.Success(
@@ -111,15 +122,14 @@ namespace Vinculacion.Application.Services
                 );
             }
         }
-        public async Task<OperationResult<bool>> UpdateProyectoAsync(decimal proyectoId,UpdateProyectoDto dto)
+        public async Task<OperationResult<bool>> UpdateProyectoAsync(decimal proyectoId,UpdateProyectoDto dto, decimal usuarioId)
         {
             var validation = await _updateValidator.ValidateAsync(dto);
             if (!validation.IsValid)
             {
                 return OperationResult<bool>.Failure(
-                    "Error:",
-                    validation.Errors.Select(e => e.ErrorMessage)
-                );
+                string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage))
+            );
             }
 
             var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
@@ -131,6 +141,19 @@ namespace Vinculacion.Application.Services
 
             var proyecto = proyectoResult.Data;
 
+            var antes = JsonSerializer.Serialize(new
+            {
+                proyecto.TituloProyecto,
+                proyecto.DescripcionGeneral,
+                proyecto.FechaInicio,
+                proyecto.FechaFin,
+                proyecto.Ambito,
+                proyecto.Sector,
+                proyecto.RecintoID,
+                proyecto.PersonaID
+            });
+
+
             ProyectoVinculacionUpdateExtention.UpdateFromDto(proyecto, dto);
 
             var updateResult = await _proyectoRepository.Update(proyecto);
@@ -139,6 +162,30 @@ namespace Vinculacion.Application.Services
                 return OperationResult<bool>.Failure(updateResult.Message, null);
             }
 
+            var despues = JsonSerializer.Serialize(new
+            {
+                proyecto.TituloProyecto,
+                proyecto.DescripcionGeneral,
+                proyecto.FechaInicio,
+                proyecto.FechaFin,
+                proyecto.Ambito,
+                proyecto.Sector,
+                proyecto.RecintoID,
+                proyecto.PersonaID
+            });
+
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ProyectoVinculacion",
+                EntidadId = proyectoId,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
+
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success(
@@ -146,7 +193,7 @@ namespace Vinculacion.Application.Services
             );
         }
 
-        public async Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId)
+        public async Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId, decimal usuarioId)
         {
             var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
             if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
@@ -187,7 +234,14 @@ namespace Vinculacion.Application.Services
                 proyecto.FechaModificacion = DateTime.Now;
                 await _proyectoRepository.Update(proyecto);
             }
-
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadToProyecto",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success(
@@ -196,7 +250,7 @@ namespace Vinculacion.Application.Services
             );
         }
 
-        public async Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId, AddActividadesToProyectoDto dto)
+        public async Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId, AddActividadesToProyectoDto dto, decimal usuarioId)
         {
             var validation = await _addActividadesValidator.ValidateAsync(dto);
             if (!validation.IsValid)
@@ -251,7 +305,14 @@ namespace Vinculacion.Application.Services
                 proyecto.FechaModificacion = DateTime.Now;
                 await _proyectoRepository.Update(proyecto);
             }
-
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadesToProyecto",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success(

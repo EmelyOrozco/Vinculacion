@@ -8,7 +8,7 @@ namespace Vinculacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PersonaVinculacionController : ControllerBase
+    public class PersonaVinculacionController : BaseController
     {
         private readonly IPersonaVinculacionService _personaVinculacionService;
         public PersonaVinculacionController(IPersonaVinculacionService personaVinculacionService)
@@ -20,12 +20,13 @@ namespace Vinculacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPersonaVinculacion([FromBody] PersonaVinculacionDto request)
         {
-            var result = await _personaVinculacionService.AddPersonaVinculacion(request);
+            var usuarioId = UsuarioId;
+            var result = await _personaVinculacionService.AddPersonaVinculacion(request, usuarioId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
             }
-            return Ok(result.Data);
+            return Ok(result.Message);
         }
 
         [Authorize(Roles = "Superusuario, Usuario Consultor")]
@@ -54,9 +55,10 @@ namespace Vinculacion.API.Controllers
 
         [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(decimal id, [FromBody] PersonaVinculacionDto dto)
+        public async Task<IActionResult> Update(decimal id, [FromBody] PersonaVinculacionUpdateDto dto)
         {
-            var result = await _personaVinculacionService.UpdateAsync(id, dto);
+            var usuarioId = UsuarioId;
+            var result = await _personaVinculacionService.UpdateAsync(id, dto, usuarioId);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Message);

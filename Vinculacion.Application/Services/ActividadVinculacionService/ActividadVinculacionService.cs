@@ -1,4 +1,5 @@
-﻿using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
+﻿using System.Text.Json;
+using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
@@ -19,7 +20,7 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto actividadVinculacionDto)
+        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto actividadVinculacionDto, decimal usuarioId)
         {
             var actividadVinculacion = actividadVinculacionDto.ToActividadVinculacionFromDto();
 
@@ -32,7 +33,15 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
                 }
             }
-            var actividad = await _actividadVinculacionRepository.AddAsync(actividadVinculacion);
+            await _actividadVinculacionRepository.AddAsync(actividadVinculacion);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadVinculacion",
+                EntidadId = null
+            });
             var result = await _unitOfWork.SaveChangesAsync();
             
             return OperationResult<ActividadVinculacionDto>.Success("Actividad Vinculacion agregada correctamente ", result);
@@ -73,14 +82,45 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         }
 
 
-        public async Task<OperationResult<bool>> UpdateAsync(decimal id, ActividadVinculacionDto dto)
+        public async Task<OperationResult<bool>> UpdateAsync(decimal id, ActividadVinculacionDto dto, decimal usuarioId)
         {
             var result = await _actividadVinculacionRepository.GetByIdWithSubtareasAsync(id);
 
             if (!result.IsSuccess || result.Data == null)
                 return OperationResult<bool>.Failure("Actividad no encontrada");
 
-            var entity = result.Data;
+            var entity = result.Data as ActividadVinculacion;
+            if (entity == null)
+                return OperationResult<bool>.Failure("Actividad no encontrada");
+
+            var subtareasSnapshot = entity.Subtareas
+            .Select(s => new
+            {
+                s.SubtareaID,
+                s.TituloSubtarea,
+                s.Detalle,
+                s.Orden,
+                s.EstadoID,
+                s.FechaCompletado
+            })
+            .ToList();
+
+            var antes = JsonSerializer.Serialize(new
+            {
+                entity.ActorExternoId,
+                entity.RecintoId,
+                entity.TipoVinculacionId,
+                entity.PersonaId,
+                entity.EstadoId,
+                entity.TituloActividad,
+                entity.Modalidad,
+                entity.Lugar,
+                entity.FechaHoraEvento,
+                entity.Ambito,
+                entity.Sector,
+                Subtareas = subtareasSnapshot
+            });
+
 
             if (dto.ActorExternoId.HasValue && dto.ActorExternoId > 0)
                 entity.ActorExternoId = dto.ActorExternoId.Value;
@@ -127,6 +167,45 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                     entity.Subtareas.Add(subtareaDto.ToActividadSubtareasFromDto());
                 }
             }
+
+            var subtareasDespues = entity.Subtareas
+            .Select(s => new
+            {
+                s.SubtareaID,
+                s.TituloSubtarea,
+                s.Detalle,
+                s.Orden,
+                s.EstadoID,
+                s.FechaCompletado
+            })
+            .ToList();
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                entity.ActorExternoId,
+                entity.RecintoId,
+                entity.TipoVinculacionId,
+                entity.PersonaId,
+                entity.EstadoId,
+                entity.TituloActividad,
+                entity.Modalidad,
+                entity.Lugar,
+                entity.FechaHoraEvento,
+                entity.Ambito,
+                entity.Sector,
+                Subtareas = subtareasDespues
+            });
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ActividadVinculacion",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
 
             await _unitOfWork.SaveChangesAsync();
 
