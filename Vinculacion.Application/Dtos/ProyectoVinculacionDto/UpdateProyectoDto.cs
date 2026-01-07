@@ -4,7 +4,7 @@
     {
         public decimal? PersonaID { get; set; }
         public decimal? RecintoID { get; set; }
-
+        public decimal? EstadoID { get; set; }
         public string? TituloProyecto { get; set; }
         public string? DescripcionGeneral { get; set; }
 

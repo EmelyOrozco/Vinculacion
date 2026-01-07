@@ -18,7 +18,6 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
                 FechaFin = dto.FechaFin,
                 Ambito = dto.Ambito,
                 Sector = dto.Sector,
-                EstadoID = 4,
                 FechaRegistro = DateTime.Now
             };
         }

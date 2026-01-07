@@ -12,6 +12,7 @@ using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
 using System.Text.Json;
+using Vinculacion.Application.Contante;
 
 namespace Vinculacion.Application.Services
 {
@@ -60,6 +61,9 @@ namespace Vinculacion.Application.Services
                 );
             }
             var entity = request.ToProyectoFromAddDto();
+
+            entity.EstadoID = DeterminarEstadoProyecto(entity);
+            entity.FechaRegistro = DateTime.UtcNow;
 
             await _proyectoRepository.AddAsync(entity);
             await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
@@ -162,6 +166,16 @@ namespace Vinculacion.Application.Services
 
             ProyectoVinculacionUpdateExtention.UpdateFromDto(proyecto, dto);
 
+            if (dto.EstadoID == EstadosProyecto.Deshabilitado)
+            {
+                proyecto.EstadoID = EstadosProyecto.Deshabilitado;
+            }
+            else
+            {
+                proyecto.EstadoID = DeterminarEstadoProyecto(proyecto);
+            }
+
+
             var updateResult = await _proyectoRepository.Update(proyecto);
             if (!updateResult.IsSuccess)
             {
@@ -231,15 +245,9 @@ namespace Vinculacion.Application.Services
 
             await _proyectoActividadRepository.AddAsync(relacion);
 
-            var cantidad = await _proyectoActividadRepository
-                .CountActividadesByProyecto(proyectoId);
+            proyecto.EstadoID = DeterminarEstadoProyecto(proyecto);
+            await _proyectoRepository.Update(proyecto);
 
-            if (cantidad == 0 && proyecto.EstadoID == 4)
-            {
-                proyecto.EstadoID = 1; 
-                proyecto.FechaModificacion = DateTime.Now;
-                await _proyectoRepository.Update(proyecto);
-            }
             await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
             {
                 UsuarioID = usuarioId,
@@ -350,68 +358,112 @@ namespace Vinculacion.Application.Services
             return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
         }
 
-
         public async Task ProcesarProyectosAsync(DateTime hoy)
         {
             var proyectos = await _proyectoRepository.GetProyectosEstatusActivo();
 
             foreach (var proyecto in proyectos)
             {
+                if (proyecto.FechaFin.HasValue &&
+                    proyecto.FechaFin.Value <= hoy)
+                {
+                    proyecto.EstadoID = EstadosProyecto.Finalizado;
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task EnviarAlertasProyectosAsync(DateTime hoy)
+        {
+            var proyectos = await _proyectoRepository.GetProyectosEstatusActivo();
+            var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+
+            foreach (var proyecto in proyectos)
+            {
                 double? diasFaltantes = null;
 
                 if (proyecto.FechaFin.HasValue)
-                {
                     diasFaltantes = (proyecto.FechaFin.Value - hoy).TotalDays;
-                }
 
                 if (!FuncionesService.DebeNotificar(diasFaltantes))
                     continue;
 
                 var titulo = FuncionesService.ObtenerTitulo("Proyecto", diasFaltantes);
                 var body = $@"
-                        <html>
-                        <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
-                            <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
-                                <h2 style='color:#333;'>🔔 Proyecto próximo a vencer</h2>
+                                <html>
+                                <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                                    <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                                        <h2 style='color:#333;'>🔔 Proyecto próximo a vencer</h2>
 
-                                <p>Hola,</p>
+                                        <p>Hola,</p>
 
-                                <p>
-                                    Te informamos que el proyecto 
-                                    <strong>{proyecto.TituloProyecto}</strong> tiene como fecha de finalización:
-                                </p>
+                                        <p>
+                                            Te informamos que el proyecto 
+                                            <strong>{proyecto.TituloProyecto}</strong> tiene como fecha de finalización:
+                                        </p>
 
-                                <p style='font-size:16px;'>
-                                    📅 <strong>{proyecto.FechaFin:dd/MM/yyyy}</strong>
-                                </p>
+                                        <p style='font-size:16px;'>
+                                            📅 <strong>{proyecto.FechaFin:dd/MM/yyyy}</strong>
+                                        </p>
 
-                                <p>
-                                    Por favor, revisa el estado del proyecto y realiza las acciones correspondientes.
-                                </p>
+                                        <p>
+                                            Por favor, revisa el estado del proyecto y realiza las acciones correspondientes.
+                                        </p>
 
-                                <hr />
+                                        <hr />
 
-                                <p style='font-size:12px; color:#777;'>
-                                    Sistema de Vinculación Universitaria<br/>
-                                    UNPHU
-                                </p>
-                            </div>
-                        </body>
-                        </html>";
-
-                var mensaje = $"El proyecto {proyecto.TituloProyecto} vence el {proyecto.FechaFin: dd/MM/yyyy}";
-
-                var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+                                        <p style='font-size:12px; color:#777;'>
+                                            Sistema de Vinculación Universitaria<br/>
+                                            UNPHU
+                                        </p>
+                                    </div>
+                                </body>
+                                </html>";
 
                 foreach (var usuario in correoUsuarios)
                 {
                     if (!string.IsNullOrWhiteSpace(usuario.CorreoInstitucional))
                     {
-                        await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                        try
+                        {
+                            await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                        }
+                        catch
+                        {
+                            // log sin romper
+                        }
                     }
                 }
-
             }
         }
+
+
+        private bool ProyectoEstaCompleto(ProyectoVinculacion p)
+        {
+            return
+                !string.IsNullOrWhiteSpace(p.TituloProyecto) &&
+                p.FechaInicio.HasValue &&
+                p.FechaFin.HasValue &&
+                p.Ambito.HasValue &&
+                p.Sector.HasValue &&
+                p.RecintoID.HasValue;
+        }
+
+        private decimal DeterminarEstadoProyecto(ProyectoVinculacion proyecto)
+        {
+            if (proyecto.EstadoID == EstadosProyecto.Deshabilitado)
+                return EstadosProyecto.Deshabilitado;
+
+            if (proyecto.FechaFin.HasValue &&
+                proyecto.FechaFin.Value <= DateTime.UtcNow)
+                return EstadosProyecto.Finalizado;
+
+            if (!ProyectoEstaCompleto(proyecto))
+                return EstadosProyecto.Parcial;
+
+            return EstadosProyecto.Activo;
+        }
+
     }
 }

@@ -123,7 +123,15 @@ namespace Vinculacion.Application.Services
 
         public static bool DebeNotificar(double? dias)
         {
-            return dias == 7 || dias == 3 || dias == 14 || dias < 0;
+            if (!dias.HasValue)
+                return false;
+
+            var diasEnteros = Math.Floor(dias.Value);
+
+            return diasEnteros == 14
+                || diasEnteros == 7
+                || diasEnteros == 3
+                || diasEnteros == 0;
         }
 
         public static string ObtenerTitulo(string tipo, double? dias)

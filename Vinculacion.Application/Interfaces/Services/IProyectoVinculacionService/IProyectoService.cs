@@ -16,5 +16,6 @@ namespace Vinculacion.Application.Interfaces.Services.IProyectoVinculacionServic
         Task<OperationResult<List<ActividadVinculacionDto>>> GetActividadesDisponiblesAsync();
 
         Task ProcesarProyectosAsync(DateTime hoy);
+        Task EnviarAlertasProyectosAsync(DateTime hoy);
     }
 }

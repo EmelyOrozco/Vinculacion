@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Vinculacion.Application.Contante;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -29,20 +30,18 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             _emailService = emailService;
         }
 
-        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto actividadVinculacionDto, decimal usuarioId)
+        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(
+    ActividadVinculacionDto dto,
+    decimal usuarioId)
         {
-            var actividadVinculacion = actividadVinculacionDto.ToActividadVinculacionFromDto();
+            var actividad = dto.ToActividadVinculacionFromDto();
 
-            if (actividadVinculacionDto.Subtareas is not null)
-            {
-                actividadVinculacion.Subtareas = new List<ActividadSubtareas>();
-                foreach (var subtareaDto in actividadVinculacionDto.Subtareas)
-                {
-                    actividadVinculacion.Subtareas.Add(subtareaDto.ToActividadSubtareasFromDto());
+            actividad.EstadoId = DeterminarEstadoActividad(actividad);
 
-                }
-            }
-            await _actividadVinculacionRepository.AddAsync(actividadVinculacion);
+            actividad.FechaRegistro = DateTime.UtcNow;
+
+            await _actividadVinculacionRepository.AddAsync(actividad);
+
             await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
             {
                 UsuarioID = usuarioId,
@@ -51,10 +50,13 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 Entidad = "ActividadVinculacion",
                 EntidadId = null
             });
-            var result = await _unitOfWork.SaveChangesAsync();
-            
-            return OperationResult<ActividadVinculacionDto>.Success("Actividad Vinculacion agregada correctamente ", result);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<ActividadVinculacionDto>
+                .Success("Actividad creada correctamente", dto);
         }
+
 
         public async Task<OperationResult<List<ActividadVinculacionDto>>> GetAllAsync()
         {
@@ -143,9 +145,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             if (dto.PersonaId.HasValue && dto.PersonaId > 0)
                 entity.PersonaId = dto.PersonaId.Value;
 
-            if (dto.EstadoId.HasValue && dto.EstadoId > 0)
-                entity.EstadoId = dto.EstadoId.Value;
-
             if (!string.IsNullOrWhiteSpace(dto.TituloActividad))
                 entity.TituloActividad = dto.TituloActividad;
 
@@ -216,17 +215,26 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 DetalleDespues = despues
             });
 
+            if (dto.EstadoId == EstadosActividad.Deshabilitado)
+            {
+                entity.EstadoId = EstadosActividad.Deshabilitado;
+            }
+            else
+            {
+                entity.EstadoId = DeterminarEstadoActividad(entity);
+            }
+
+
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success("Actividad actualizada correctamente", true);
         }
 
-
-        public async Task ProcesarActividadesAsync(DateTime hoy)
+        public async Task EnviarAlertasActividadesAsync(DateTime hoy)
         {
             var actividades = await _actividadVinculacionRepository.GetActividadEstatusActivo();
 
-            foreach(var actividad in actividades)
+            foreach (var actividad in actividades)
             {
                 double? diasFaltantes = null;
 
@@ -240,35 +248,35 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
                 var titulo = FuncionesService.ObtenerTitulo("Actividad", diasFaltantes);
                 var body = $@"
-                <html>
-                <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
-                    <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
-                        <h2 style='color:#333;'>🔔 Actividad próxima a vencer</h2>
+                        <html>
+                        <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                            <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                                <h2 style='color:#333;'>🔔 Actividad próxima a vencer</h2>
 
-                        <p>Hola,</p>
+                                <p>Hola,</p>
 
-                        <p>
-                            Te informamos que la actividad 
-                            <strong>{actividad.TituloActividad}</strong> tiene como fecha de finalización:
-                        </p>
+                                <p>
+                                    Te informamos que la actividad 
+                                    <strong>{actividad.TituloActividad}</strong> tiene como fecha de finalización:
+                                </p>
 
-                        <p style='font-size:16px;'>
-                            📅 <strong>{actividad.FechaHoraEvento:dd/MM/yyyy}</strong>
-                        </p>
+                                <p style='font-size:16px;'>
+                                    📅 <strong>{actividad.FechaHoraEvento:dd/MM/yyyy}</strong>
+                                </p>
 
-                        <p>
-                            Por favor, revisa el estado de la actividad y realiza las acciones correspondientes.
-                        </p>
+                                <p>
+                                    Por favor, revisa el estado de la actividad y realiza las acciones correspondientes.
+                                </p>
 
-                        <hr />
+                                <hr />
 
-                        <p style='font-size:12px; color:#777;'>
-                            Sistema de Vinculación Universitaria<br/>
-                            UNPHU
-                        </p>
-                    </div>
-                </body>
-                </html>";
+                                <p style='font-size:12px; color:#777;'>
+                                    Sistema de Vinculación Universitaria<br/>
+                                    UNPHU
+                                </p>
+                            </div>
+                        </body>
+                        </html>";
 
                 var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
 
@@ -279,8 +287,58 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                         await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
                     }
                 }
-
             }
         }
+
+
+
+        public async Task ProcesarActividadesAsync(DateTime hoy)
+        {
+            var actividades = await _actividadVinculacionRepository.GetActividadEstatusActivo();
+
+            foreach (var actividad in actividades)
+            {
+                if (!actividad.FechaHoraEvento.HasValue)
+                    continue;
+
+                if (actividad.FechaHoraEvento.Value <= hoy)
+                {
+                    actividad.EstadoId = EstadosActividad.Finalizado;
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+
+        private bool ActividadEstaCompleta(ActividadVinculacion a)
+            {
+                return
+                    a.ActorExternoId.HasValue &&
+                    a.RecintoId.HasValue &&
+                    a.TipoVinculacionId.HasValue &&
+                    !string.IsNullOrWhiteSpace(a.TituloActividad) &&
+                    a.Modalidad.HasValue &&
+                    !string.IsNullOrWhiteSpace(a.Lugar) &&
+                    a.FechaHoraEvento.HasValue &&
+                    a.Ambito.HasValue &&
+                    a.Sector.HasValue;
+            }
+
+        private decimal DeterminarEstadoActividad(ActividadVinculacion actividad)
+        {
+            if (actividad.EstadoId == EstadosActividad.Deshabilitado)
+                return EstadosActividad.Deshabilitado;
+
+            if (actividad.FechaHoraEvento.HasValue &&
+                actividad.FechaHoraEvento.Value <= DateTime.UtcNow)
+                return EstadosActividad.Finalizado;
+
+            if (!ActividadEstaCompleta(actividad))
+                return EstadosActividad.Parcial;
+
+            return EstadosActividad.Activo;
+        }
+
     }
 }
