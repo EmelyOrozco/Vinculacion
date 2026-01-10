@@ -43,10 +43,9 @@ namespace Vinculacion.Persistence.Context
         public DbSet<Carrera> Carreras { get; set; }
         public DbSet<DocumentoAdjunto> DocumentoAdjunto { get; set; }
         public DbSet<Estado> Estado { get; set; }
-
         public DbSet<Rol> Rol { get; set; }
-
         public DbSet<ProyectoVinculacion> ProyectoVinculacion { get; set; }
+        public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
