@@ -358,6 +358,44 @@ namespace Vinculacion.Application.Services
             return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
         }
 
+        public async Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesDisponiblesByProyectoAsync(decimal proyectoId)
+        {
+            var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
+            if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Failure("El proyecto no existe", null);
+            }
+
+            var proyecto = proyectoResult.Data;
+
+            if (proyecto.ActorExternoID == null)
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Success("El proyecto no tiene actor externo asignado",
+                        new List<ActividadVinculacionDto>());
+            }
+
+            List<ActividadVinculacion> actividades =await _actividadRepository.GetActividadesDisponiblesByActorExterno(proyecto.ActorExternoID);
+
+            if (!actividades.Any())
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Success(
+                        "No existen actividades disponibles para este proyecto",
+                        new List<ActividadVinculacionDto>()
+                    );
+            }
+
+            var response = actividades
+                .Select(a => a.ToActividadVinculacionDto())
+                .ToList();
+
+            return OperationResult<List<ActividadVinculacionDto>>
+                .Success("Actividades disponibles obtenidas", response);
+        }
+
+
         public async Task ProcesarProyectosAsync(DateTime hoy)
         {
             var proyectos = await _proyectoRepository.GetProyectosEstatusActivo();
@@ -464,6 +502,8 @@ namespace Vinculacion.Application.Services
 
             return EstadosProyecto.Activo;
         }
+
+
 
     }
 }

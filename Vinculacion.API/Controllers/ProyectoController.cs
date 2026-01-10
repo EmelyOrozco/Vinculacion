@@ -131,4 +131,21 @@ public class ProyectoController : BaseController
         return Ok(new{ message = result.Message, data = result.Data});
     }
 
+    /// <summary>
+    /// Obtiene las actividades disponibles para vincular a un proyecto,
+    /// filtradas por el actor externo del proyecto.
+    /// </summary>
+    [HttpGet("{proyectoId}/ActividadesDisponibles")]
+    public async Task<IActionResult> GetActividadesDisponiblesByProyecto(decimal proyectoId)
+    {
+        var result = await _proyectoService
+            .GetActividadesDisponiblesByProyectoAsync(proyectoId);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+
 }
