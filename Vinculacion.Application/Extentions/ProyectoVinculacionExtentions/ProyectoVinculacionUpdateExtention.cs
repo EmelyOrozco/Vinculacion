@@ -31,6 +31,9 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
             if (dto.Sector.HasValue && dto.Sector > 0)
                 entity.Sector = dto.Sector.Value;
 
+            if (dto.TipoVinculacionID.HasValue)
+                entity.TipoVinculacionID = dto.TipoVinculacionID.Value;
+
             entity.FechaModificacion = DateTime.Now;
         }
     }

@@ -121,6 +121,8 @@ builder.Services.AddScoped<ICharlaVinculacionRepository, CharlaVinculacionReposi
 builder.Services.AddTransient<ICharlaService, CharlaService>();
 
 builder.Services.AddScoped<IPasantiaService, PasantiaService>();
+builder.Services.AddScoped<ITipoVinculacionRepository, TipoVinculacionRepository>();
+builder.Services.AddScoped<ITipoVinculacionService, TipoVinculacionService>();
 
 builder.Services.AddAuthentication(options =>
         {
@@ -147,7 +149,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vinculación API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "VinculaciÃ³n API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

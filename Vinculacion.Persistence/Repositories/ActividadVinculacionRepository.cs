@@ -85,6 +85,15 @@ namespace Vinculacion.Persistence.Repositories
 
             return actividadesCharla;
 
+        public async Task<List<ActividadVinculacion>> GetActividadesDisponiblesByActorExterno(decimal actorExternoId)
+        {
+            return await _context.ActividadVinculacion
+                .Where(a =>
+                    a.ActorExternoId == actorExternoId &&
+                    !_context.ProyectoActividad
+                        .Any(pa => pa.ActividadID == a.ActividadId)
+                )
+                .ToListAsync();
         }
 
     }

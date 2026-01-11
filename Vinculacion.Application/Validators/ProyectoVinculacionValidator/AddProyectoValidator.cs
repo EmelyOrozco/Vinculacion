@@ -10,9 +10,8 @@ namespace Vinculacion.Application.Validators.ProyectoVinculacionValidator
             RuleFor(x => x.ActorExternoID)
                 .NotEmpty().WithMessage("El Actor Externo es obligatorio");
 
-            RuleFor(x => x.TituloProyecto)
-                .NotEmpty().WithMessage("El título del proyecto es obligatorio")
-                .MaximumLength(200);
+            RuleFor(x => x.PersonaID)
+                .NotEmpty().WithMessage("Persona vinculante es obligatoria");
 
             RuleFor(x => x.FechaFin)
                 .GreaterThanOrEqualTo(x => x.FechaInicio)

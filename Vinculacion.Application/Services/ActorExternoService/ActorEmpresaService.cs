@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Vinculacion.Application.Dtos.ActorExterno;
+using System.Text.Json;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -34,7 +34,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OperationResult<AddActorEmpresaDto>> AddActorEmpresaAsync(AddActorEmpresaDto addActorEmpresaDto)
+        public async Task<OperationResult<AddActorEmpresaDto>> AddActorEmpresaAsync(AddActorEmpresaDto addActorEmpresaDto, decimal usuarioId)
         {
             bool actorEmpresaExists = await _actorEmpresaRepository.ActorEmpresaExistsAsync(addActorEmpresaDto.IdentificacionNumero, addActorEmpresaDto.NombreEmpresa);
 
@@ -58,7 +58,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             {
                 bool validarIdentificacion = FuncionesService.ValidarIdentificacion(addActorEmpresaDto.TipoIdentificacion, addActorEmpresaDto.IdentificacionNumero);
 
-                if (validarIdentificacion)
+                if (!validarIdentificacion)
                 {
                     return OperationResult<AddActorEmpresaDto>.Failure("El no. de identificacion no es valido");
                 }
@@ -77,6 +77,14 @@ namespace Vinculacion.Application.Services.ActorExternoService
             };
 
             await _actorExternoRepository.AddAsync(actorExternoEntity);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActorEmpresa",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             var entity = addActorEmpresaDto.ToActorEmpresaFromActorEmpresaDto();
@@ -121,13 +129,27 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<ActorEmpresaResponseDto>.Success("Empresa obtenida correctamente", entity.ToResponseDto());
         }
 
-        public async Task<OperationResult<bool>> UpdateActorEmpresaAsync(decimal id, UpdateActorEmpresaDto dto)
+        public async Task<OperationResult<bool>> UpdateActorEmpresaAsync(decimal id, UpdateActorEmpresaDto dto, decimal usuarioId)
         {
             var entity = await _actorEmpresaRepository.GetByIdWithClasificacionesAsync(id);
 
             if (entity == null)
                 return OperationResult<bool>.Failure("La empresa no existe");
 
+            var antes = new
+            {
+                entity.NombreEmpresa,
+                entity.IdentificacionNumero,
+                entity.ContactoNombrePersona,
+                entity.ContactoCorreo,
+                entity.ContactoTelefono,
+                entity.PaisID,
+                entity.ActorExterno.EstadoID,
+                Clasificaciones = entity.ActorEmpresaClasificaciones
+                .Select(x => x.ClasificacionID)
+                .ToList()
+            };
+           
             if (entity.ActorExterno == null)
                 return OperationResult<bool>.Failure("Error de integridad: ActorExterno no existe");
 
@@ -174,6 +196,34 @@ namespace Vinculacion.Application.Services.ActorExternoService
                         });
                 }
             }
+
+            var despues = new
+            {
+                entity.NombreEmpresa,
+                entity.IdentificacionNumero,
+                entity.ContactoNombrePersona,
+                entity.ContactoCorreo,
+                entity.ContactoTelefono,
+                entity.PaisID,
+                entity.ActorExterno.EstadoID,
+                Clasificaciones = entity.ActorEmpresaClasificaciones
+                .Select(x => x.ClasificacionID)
+                .ToList()
+            };
+
+            var antesJson = JsonSerializer.Serialize(antes);
+            var despuesJson = JsonSerializer.Serialize(despues);
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ActorEmpresa",
+                EntidadId = id,
+                DetalleAntes = antesJson,
+                DetalleDespues = despuesJson
+            });
 
             await _unitOfWork.SaveChangesAsync();
 

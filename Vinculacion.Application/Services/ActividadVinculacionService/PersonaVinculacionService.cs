@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System.Text.Json;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
@@ -23,7 +24,7 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto personaVinculacionDto)
+        public async Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto personaVinculacionDto, decimal usuarioId)
         {
             var personaVinculacion = personaVinculacionDto.ToPersonaVinculacionFromDto();
 
@@ -35,6 +36,14 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             }
 
             var guardar = await _personaVinculacionRepository.AddAsync(personaVinculacion);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "PersonaVinculacion",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<PersonaVinculacionDto>.Success("Persona vincunlante guardada correctamente", personaVinculacionDto);
@@ -73,7 +82,7 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         }
 
 
-        public async Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionDto dto)
+        public async Task<OperationResult<bool>> UpdateAsync(decimal id, PersonaVinculacionUpdateDto dto, decimal usuarioId)
         {
             var entityResult = await _personaVinculacionRepository.GetByIdAsync(id);
 
@@ -81,6 +90,23 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 return OperationResult<bool>.Failure("Persona vinculada no encontrada");
 
             var entity = entityResult.Data;
+
+            var antes = JsonSerializer.Serialize(new
+            {
+                entity.TipoPersonaID,
+                entity.RecintoID,
+                entity.EscuelaID,
+                entity.CarreraID,
+                entity.NombreCompleto,
+                entity.Correo,
+                entity.TelefonoContacto,
+                entity.TipoRelacion,
+                entity.Matricula,
+                entity.CodigoEmpleado,
+                entity.AnoEgreso,
+                entity.CargoEmpresa
+            });
+
 
             if (dto.TipoPersonaID.HasValue && dto.TipoPersonaID > 0)
                 entity.TipoPersonaID = dto.TipoPersonaID.Value;
@@ -117,6 +143,34 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             if (!string.IsNullOrWhiteSpace(dto.CargoEmpresa))
                 entity.CargoEmpresa = dto.CargoEmpresa;
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                entity.TipoPersonaID,
+                entity.RecintoID,
+                entity.EscuelaID,
+                entity.CarreraID,
+                entity.NombreCompleto,
+                entity.Correo,
+                entity.TelefonoContacto,
+                entity.TipoRelacion,
+                entity.Matricula,
+                entity.CodigoEmpleado,
+                entity.AnoEgreso,
+                entity.CargoEmpresa
+            });
+
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "PersonaVinculacion",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
 
             await _unitOfWork.SaveChangesAsync();
 

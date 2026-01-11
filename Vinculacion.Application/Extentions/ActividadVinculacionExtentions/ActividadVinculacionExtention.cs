@@ -13,7 +13,6 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
                 RecintoId = actividadVinculacionDto.RecintoId,
                 TipoVinculacionId = actividadVinculacionDto.TipoVinculacionId,
                 PersonaId = actividadVinculacionDto.PersonaId,
-                EstadoId = actividadVinculacionDto.EstadoId,
                 TituloActividad = actividadVinculacionDto.TituloActividad,
                 DescripcionActividad = actividadVinculacionDto.DescripcionActividad,
                 Modalidad = actividadVinculacionDto.Modalidad,

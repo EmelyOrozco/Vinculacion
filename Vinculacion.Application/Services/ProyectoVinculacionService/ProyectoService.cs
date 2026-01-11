@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using FluentValidation;
-using System.Formats.Asn1;
+﻿using FluentValidation;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
@@ -13,6 +11,8 @@ using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
+using System.Text.Json;
+using Vinculacion.Application.Contante;
 
 namespace Vinculacion.Application.Services
 {
@@ -27,6 +27,7 @@ namespace Vinculacion.Application.Services
         private readonly IValidator<AddActividadesToProyectoDto> _addActividadesValidator;
         private readonly IUsersRepository _usersRepository;
         private readonly IEmailService _emailService;
+        private readonly ITipoVinculacionRepository _tipoVinculacionRepository;
 
         public ProyectoService(
             IProyectoRepository proyectoRepository,
@@ -37,7 +38,8 @@ namespace Vinculacion.Application.Services
             IProyectoActividadRepository proyectoActividadRepository,
             IValidator<AddActividadesToProyectoDto> addActividadesValidator,
             IUsersRepository usersRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            ITipoVinculacionRepository tipoVinculacionRepository)
         {
             _proyectoRepository = proyectoRepository;
             _validator = validator;
@@ -48,9 +50,10 @@ namespace Vinculacion.Application.Services
             _addActividadesValidator = addActividadesValidator;
             _usersRepository = usersRepository;
             _emailService = emailService;
+            _tipoVinculacionRepository = tipoVinculacionRepository;
         }
 
-        public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request)
+        public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request, decimal usuarioId)
         {
             var validation = await _validator.ValidateAsync(request);
             if (!validation.IsValid)
@@ -60,9 +63,29 @@ namespace Vinculacion.Application.Services
                     validation.Errors.Select(e => e.ErrorMessage)
                 );
             }
+
+            var tipo = await _tipoVinculacionRepository.GetByIdAsync(request.TipoVinculacionID);
+            if (tipo == null || !tipo.EsProyecto)
+            {
+                return OperationResult<AddProyectoDto>.Failure(
+                    "Solo se permiten Pasantías o Servicio Social para proyectos."
+                );
+            }
+
             var entity = request.ToProyectoFromAddDto();
 
+            entity.EstadoID = DeterminarEstadoProyecto(entity);
+            entity.FechaRegistro = DateTime.UtcNow;
+
             await _proyectoRepository.AddAsync(entity);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ProyectoVinculacion",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<AddProyectoDto>.Success(
@@ -121,15 +144,14 @@ namespace Vinculacion.Application.Services
                 );
             }
         }
-        public async Task<OperationResult<bool>> UpdateProyectoAsync(decimal proyectoId,UpdateProyectoDto dto)
+        public async Task<OperationResult<bool>> UpdateProyectoAsync(decimal proyectoId,UpdateProyectoDto dto, decimal usuarioId)
         {
             var validation = await _updateValidator.ValidateAsync(dto);
             if (!validation.IsValid)
             {
                 return OperationResult<bool>.Failure(
-                    "Error:",
-                    validation.Errors.Select(e => e.ErrorMessage)
-                );
+                string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage))
+            );
             }
 
             var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
@@ -141,13 +163,72 @@ namespace Vinculacion.Application.Services
 
             var proyecto = proyectoResult.Data;
 
+            var antes = JsonSerializer.Serialize(new
+            {
+                proyecto.TituloProyecto,
+                proyecto.DescripcionGeneral,
+                proyecto.FechaInicio,
+                proyecto.FechaFin,
+                proyecto.Ambito,
+                proyecto.Sector,
+                proyecto.RecintoID,
+                proyecto.PersonaID
+            });
+
+            if (dto.TipoVinculacionID.HasValue)
+            {
+                var tipo = await _tipoVinculacionRepository
+                    .GetByIdAsync(dto.TipoVinculacionID.Value);
+
+                if (tipo == null || !tipo.EsProyecto)
+                {
+                    return OperationResult<bool>.Failure(
+                        "No se puede asignar un tipo de vinculación que no sea de proyecto."
+                    );
+                }
+            }
+
             ProyectoVinculacionUpdateExtention.UpdateFromDto(proyecto, dto);
+
+            if (dto.EstadoID == EstadosProyecto.Deshabilitado)
+            {
+                proyecto.EstadoID = EstadosProyecto.Deshabilitado;
+            }
+            else
+            {
+                proyecto.EstadoID = DeterminarEstadoProyecto(proyecto);
+            }
+
 
             var updateResult = await _proyectoRepository.Update(proyecto);
             if (!updateResult.IsSuccess)
             {
                 return OperationResult<bool>.Failure(updateResult.Message, null);
             }
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                proyecto.TituloProyecto,
+                proyecto.DescripcionGeneral,
+                proyecto.FechaInicio,
+                proyecto.FechaFin,
+                proyecto.Ambito,
+                proyecto.Sector,
+                proyecto.RecintoID,
+                proyecto.PersonaID
+            });
+
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ProyectoVinculacion",
+                EntidadId = proyectoId,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
 
             await _unitOfWork.SaveChangesAsync();
 
@@ -156,7 +237,7 @@ namespace Vinculacion.Application.Services
             );
         }
 
-        public async Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId)
+        public async Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId, decimal usuarioId)
         {
             var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
             if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
@@ -188,16 +269,17 @@ namespace Vinculacion.Application.Services
 
             await _proyectoActividadRepository.AddAsync(relacion);
 
-            var cantidad = await _proyectoActividadRepository
-                .CountActividadesByProyecto(proyectoId);
+            proyecto.EstadoID = DeterminarEstadoProyecto(proyecto);
+            await _proyectoRepository.Update(proyecto);
 
-            if (cantidad == 0 && proyecto.EstadoID == 4)
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
             {
-                proyecto.EstadoID = 1; 
-                proyecto.FechaModificacion = DateTime.Now;
-                await _proyectoRepository.Update(proyecto);
-            }
-
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadToProyecto",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success(
@@ -206,7 +288,7 @@ namespace Vinculacion.Application.Services
             );
         }
 
-        public async Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId, AddActividadesToProyectoDto dto)
+        public async Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId, AddActividadesToProyectoDto dto, decimal usuarioId)
         {
             var validation = await _addActividadesValidator.ValidateAsync(dto);
             if (!validation.IsValid)
@@ -261,7 +343,14 @@ namespace Vinculacion.Application.Services
                 proyecto.FechaModificacion = DateTime.Now;
                 await _proyectoRepository.Update(proyecto);
             }
-
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadesToProyecto",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success(
@@ -293,6 +382,43 @@ namespace Vinculacion.Application.Services
             return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
         }
 
+        public async Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesDisponiblesByProyectoAsync(decimal proyectoId)
+        {
+            var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);
+            if (!proyectoResult.IsSuccess || proyectoResult.Data == null)
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Failure("El proyecto no existe", null);
+            }
+
+            var proyecto = proyectoResult.Data;
+
+            if (proyecto.ActorExternoID == null)
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Success("El proyecto no tiene actor externo asignado",
+                        new List<ActividadVinculacionDto>());
+            }
+
+            List<ActividadVinculacion> actividades =await _actividadRepository.GetActividadesDisponiblesByActorExterno(proyecto.ActorExternoID);
+
+            if (!actividades.Any())
+            {
+                return OperationResult<List<ActividadVinculacionDto>>
+                    .Success(
+                        "No existen actividades disponibles para este proyecto",
+                        new List<ActividadVinculacionDto>()
+                    );
+            }
+
+            var response = actividades
+                .Select(a => a.ToActividadVinculacionDto())
+                .ToList();
+
+            return OperationResult<List<ActividadVinculacionDto>>
+                .Success("Actividades disponibles obtenidas", response);
+        }
+
 
         public async Task ProcesarProyectosAsync(DateTime hoy)
         {
@@ -300,61 +426,108 @@ namespace Vinculacion.Application.Services
 
             foreach (var proyecto in proyectos)
             {
+                if (proyecto.FechaFin.HasValue &&
+                    proyecto.FechaFin.Value <= hoy)
+                {
+                    proyecto.EstadoID = EstadosProyecto.Finalizado;
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task EnviarAlertasProyectosAsync(DateTime hoy)
+        {
+            var proyectos = await _proyectoRepository.GetProyectosEstatusActivo();
+            var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+
+            foreach (var proyecto in proyectos)
+            {
                 double? diasFaltantes = null;
 
                 if (proyecto.FechaFin.HasValue)
-                {
                     diasFaltantes = (proyecto.FechaFin.Value - hoy).TotalDays;
-                }
 
                 if (!FuncionesService.DebeNotificar(diasFaltantes))
                     continue;
 
                 var titulo = FuncionesService.ObtenerTitulo("Proyecto", diasFaltantes);
                 var body = $@"
-                        <html>
-                        <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
-                            <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
-                                <h2 style='color:#333;'>🔔 Proyecto próximo a vencer</h2>
+                                <html>
+                                <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                                    <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                                        <h2 style='color:#333;'>🔔 Proyecto próximo a vencer</h2>
 
-                                <p>Hola,</p>
+                                        <p>Hola,</p>
 
-                                <p>
-                                    Te informamos que el proyecto 
-                                    <strong>{proyecto.TituloProyecto}</strong> tiene como fecha de finalización:
-                                </p>
+                                        <p>
+                                            Te informamos que el proyecto 
+                                            <strong>{proyecto.TituloProyecto}</strong> tiene como fecha de finalización:
+                                        </p>
 
-                                <p style='font-size:16px;'>
-                                    📅 <strong>{proyecto.FechaFin:dd/MM/yyyy}</strong>
-                                </p>
+                                        <p style='font-size:16px;'>
+                                            📅 <strong>{proyecto.FechaFin:dd/MM/yyyy}</strong>
+                                        </p>
 
-                                <p>
-                                    Por favor, revisa el estado del proyecto y realiza las acciones correspondientes.
-                                </p>
+                                        <p>
+                                            Por favor, revisa el estado del proyecto y realiza las acciones correspondientes.
+                                        </p>
 
-                                <hr />
+                                        <hr />
 
-                                <p style='font-size:12px; color:#777;'>
-                                    Sistema de Vinculación Universitaria<br/>
-                                    UNPHU
-                                </p>
-                            </div>
-                        </body>
-                        </html>";
-
-                var mensaje = $"El proyecto {proyecto.TituloProyecto} vence el {proyecto.FechaFin: dd/MM/yyyy}";
-
-                var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
+                                        <p style='font-size:12px; color:#777;'>
+                                            Sistema de Vinculación Universitaria<br/>
+                                            UNPHU
+                                        </p>
+                                    </div>
+                                </body>
+                                </html>";
 
                 foreach (var usuario in correoUsuarios)
                 {
                     if (!string.IsNullOrWhiteSpace(usuario.CorreoInstitucional))
                     {
-                        await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                        try
+                        {
+                            await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
+                        }
+                        catch
+                        {
+                            // log sin romper
+                        }
                     }
                 }
-
             }
         }
+
+
+        private bool ProyectoEstaCompleto(ProyectoVinculacion p)
+        {
+            return
+                !string.IsNullOrWhiteSpace(p.TituloProyecto) &&
+                p.FechaInicio.HasValue &&
+                p.FechaFin.HasValue &&
+                p.Ambito.HasValue &&
+                p.Sector.HasValue &&
+                p.RecintoID.HasValue;
+        }
+
+        private decimal DeterminarEstadoProyecto(ProyectoVinculacion proyecto)
+        {
+            if (proyecto.EstadoID == EstadosProyecto.Deshabilitado)
+                return EstadosProyecto.Deshabilitado;
+
+            if (proyecto.FechaFin.HasValue &&
+                proyecto.FechaFin.Value <= DateTime.UtcNow)
+                return EstadosProyecto.Finalizado;
+
+            if (!ProyectoEstaCompleto(proyecto))
+                return EstadosProyecto.Parcial;
+
+            return EstadosProyecto.Activo;
+        }
+
+
+
     }
 }

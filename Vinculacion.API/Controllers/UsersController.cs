@@ -8,7 +8,7 @@ namespace Vinculacion.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Superusuario")]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseController
     {
        private readonly IUsersService _usersService;
         public UsersController(IUsersService usersService)
@@ -19,13 +19,14 @@ namespace Vinculacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> RegistrarUsuario([FromBody] UsersAddDto usersDto) 
         {
-            var result = await _usersService.AddUserAsync(usersDto);
+            var usuarioId = UsuarioId;
+            var result = await _usersService.AddUserAsync(usersDto, usuarioId);
 
             if (!result.IsSuccess) 
             {
                 return BadRequest(result); 
             }
-            return Ok(result.Data);
+            return Ok(result.Message);
         }
 
         [HttpGet]
@@ -59,49 +60,53 @@ namespace Vinculacion.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
         {
-            var result = await _usersService.UpdateUserAsync(usersUpdateDto, id);
+            var usuarioId = UsuarioId;
+            var result = await _usersService.UpdateUserAsync(usersUpdateDto, id, usuarioId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
 
-            return Ok(result.Data);
+            return Ok(result.Message);
         }
 
         [HttpPut("{id}/Rol")]
-        public async Task<IActionResult> UpdateUserRole(decimal id, [FromBody] UsersUpdateDto dto)
+        public async Task<IActionResult> UpdateUserRole(decimal id, [FromBody] UsersUpdateRolDto dto)
         {
-            var result = await _usersService.UpdateUserRolAsync(id, dto);
+            var usuarioId = UsuarioId;
+            var result = await _usersService.UpdateUserRolAsync(id, dto, usuarioId);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Message);
 
-            return Ok();
+            return Ok(result.Message);
         }
 
         [HttpPut("{id}/State")]
-        public async Task<IActionResult> UpdateStateUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
+        public async Task<IActionResult> UpdateStateUser([FromBody] UsersUpdateStateDto usersUpdateDto, decimal id)
         {
-            var result = await _usersService.UpdateUserStateAsync(id, usersUpdateDto);
+            var usuarioId = UsuarioId;
+            var result = await _usersService.UpdateUserStateAsync(id, usersUpdateDto, usuarioId);
 
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
 
-            return Ok(result.Data);
+            return Ok(result.Message);
         }
 
         [HttpPut("{id}/Pass")]
-        public async Task<IActionResult> UpdatePasswordUser([FromBody] UsersUpdateDto usersUpdateDto, decimal id)
+        public async Task<IActionResult> UpdatePasswordUser([FromBody] UsersUpdatePassDto usersUpdateDto, decimal id)
         {
-            var result = await _usersService.UpdateUserPasswordAsync(id, usersUpdateDto);
+            var usuarioId = UsuarioId;
+            var result = await _usersService.UpdateUserPasswordAsync(id, usersUpdateDto, usuarioId);
 
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
-            return Ok();
+            return Ok(result.Message);
         }
     }
 }

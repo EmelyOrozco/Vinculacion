@@ -43,10 +43,9 @@ namespace Vinculacion.Persistence.Context
         public DbSet<Carrera> Carreras { get; set; }
         public DbSet<DocumentoAdjunto> DocumentoAdjunto { get; set; }
         public DbSet<Estado> Estado { get; set; }
-
         public DbSet<Rol> Rol { get; set; }
-
         public DbSet<ProyectoVinculacion> ProyectoVinculacion { get; set; }
+        public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
 
         public DbSet<ActorEmpresaClasificacion> ActorEmpresaClasificacion { get; set; }
 
@@ -169,8 +168,41 @@ namespace Vinculacion.Persistence.Context
             });
 
 
-            modelBuilder.Entity<Auditoria>()
-               .HasKey(e =>  e.AuditoriaID );
+            modelBuilder.Entity<Auditoria>(entity =>
+            {
+                entity.ToTable("Auditoria");
+
+                entity.HasKey(e => e.AuditoriaID);
+
+                entity.Property(e => e.AuditoriaID)
+                      .HasColumnType("numeric(9,0)")
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.UsuarioID)
+                      .HasColumnType("numeric(3,0)")
+                      .IsRequired();
+
+                entity.Property(e => e.FechaHora)
+                      .IsRequired();
+
+                entity.Property(e => e.Accion)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.Entidad)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(e => e.EntidadId)
+                      .HasColumnType("numeric(9,0)");
+
+                entity.Property(e => e.DetalleAntes)
+                      .HasColumnType("varchar(max)");
+
+                entity.Property(e => e.DetalleDespues)
+                      .HasColumnType("varchar(max)");
+            });
+
 
             modelBuilder.Entity<Subida>().HasKey(e => e.SubidaId);
 
@@ -214,5 +246,7 @@ namespace Vinculacion.Persistence.Context
                 .HasKey(e => e.TipoVinculacionID);
         }
 
+
+        }
     }
 }

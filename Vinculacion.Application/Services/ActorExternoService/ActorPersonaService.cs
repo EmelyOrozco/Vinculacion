@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
+using System.Text.Json;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
-using Vinculacion.Application.Enums;
 using Vinculacion.Application.Extentions.ActorExternoExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Vinculacion.Application.Services.ActorExternoService
 {
@@ -34,7 +33,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto)
+        public async Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto, decimal usuarioId)
         {
             bool existenciaActor = await _actorPersonaRepository.ActorPersonaExists(addActorPersonaDto.IdentificacionNumero);
 
@@ -72,6 +71,14 @@ namespace Vinculacion.Application.Services.ActorExternoService
             };
 
             var resultActor = await _actorExternoRepository.AddAsync(actorExternoEntity);
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActorPersona",
+                EntidadId = null
+            });
             await _unitOfWork.SaveChangesAsync();
 
             var entity = addActorPersonaDto.ToActorPersonaFromActorPersonaDto();
@@ -104,9 +111,21 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<AddActorPersonaDto>.Success("Persona vinculada: ", actorPersona.Data);
         }
 
-        public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id, UpdateActorPersonaDto dto)
+        public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id, UpdateActorPersonaDto dto, decimal usuarioId)
         {
             var entity = await _actorPersonaRepository.GetByIdWithActorExternoAsync(id);
+
+            var antes = JsonSerializer.Serialize(new
+            {
+                entity.NombreCompleto,
+                entity.IdentificacionNumero,
+                entity.Correo,
+                entity.Telefono,
+                entity.Sexo,
+                entity.PaisID,
+                entity.ActorExterno.EstadoID
+            });
+
 
             if (entity == null)
                 return OperationResult<bool>.Failure("La persona no existe");
@@ -139,6 +158,29 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 entity.ActorExterno.EstadoID = dto.EstadoID.Value;
 
             entity.ActorExterno.FechaModificacion = DateTime.Now;
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                entity.NombreCompleto,
+                entity.IdentificacionNumero,
+                entity.Correo,
+                entity.Telefono,
+                entity.Sexo,
+                entity.PaisID,
+                entity.ActorExterno.EstadoID
+            });
+
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ActorPersona",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
 
             await _unitOfWork.SaveChangesAsync();
 

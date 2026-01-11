@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Vinculacion.API.Controllers;
 using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
 using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProyectoController : ControllerBase
+public class ProyectoController : BaseController
 {
     private readonly IProyectoService _proyectoService;
 
@@ -16,12 +17,13 @@ public class ProyectoController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] AddProyectoDto dto)
     {
-        var result = await _proyectoService.AddProyectoAsync(dto);
+        var usuarioId = UsuarioId;
+        var result = await _proyectoService.AddProyectoAsync(dto, usuarioId);
 
         if (!result.IsSuccess)
             return BadRequest(result);
 
-        return Ok(result.Data);
+        return Ok(result.Message);
     }
 
     [HttpGet]
@@ -49,7 +51,8 @@ public class ProyectoController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProyecto(decimal id, [FromBody] UpdateProyectoDto dto)
     {
-        var result = await _proyectoService.UpdateProyectoAsync(id, dto);
+        var usuarioId = UsuarioId;
+        var result = await _proyectoService.UpdateProyectoAsync(id, dto, usuarioId);
 
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -68,8 +71,9 @@ public class ProyectoController : ControllerBase
     [HttpPost("{proyectoId}/Actividades/{actividadId}")]
     public async Task<IActionResult> AddActividadToProyecto(decimal proyectoId,decimal actividadId)
     {
+        var usuarioId = UsuarioId;
         var result = await _proyectoService
-            .AddActividadToProyectoAsync(proyectoId, actividadId);
+            .AddActividadToProyectoAsync(proyectoId, actividadId, usuarioId);
 
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -88,8 +92,9 @@ public class ProyectoController : ControllerBase
     [HttpPost("{proyectoId}/Actividades")]
     public async Task<IActionResult> AddActividadesToProyecto(decimal proyectoId,[FromBody] AddActividadesToProyectoDto dto)
     {
+        var usuarioId = UsuarioId;
         var result = await _proyectoService
-            .AddActividadesToProyectoAsync(proyectoId, dto);
+            .AddActividadesToProyectoAsync(proyectoId, dto, usuarioId);
 
         if (!result.IsSuccess)
             return BadRequest(result.Message);
@@ -125,5 +130,22 @@ public class ProyectoController : ControllerBase
 
         return Ok(new{ message = result.Message, data = result.Data});
     }
+
+    /// <summary>
+    /// Obtiene las actividades disponibles para vincular a un proyecto,
+    /// filtradas por el actor externo del proyecto.
+    /// </summary>
+    [HttpGet("{proyectoId}/ActividadesDisponibles")]
+    public async Task<IActionResult> GetActividadesDisponiblesByProyecto(decimal proyectoId)
+    {
+        var result = await _proyectoService
+            .GetActividadesDisponiblesByProyectoAsync(proyectoId);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
 
 }

@@ -19,7 +19,9 @@ namespace Vinculacion.Application.Services
             var hoy = DateTime.Today;
 
             await _proyectoService.ProcesarProyectosAsync(hoy);
+            await _proyectoService.EnviarAlertasProyectosAsync(hoy);
             await _actividadVinculacionService.ProcesarActividadesAsync(hoy);
+            await _actividadVinculacionService.EnviarAlertasActividadesAsync(hoy);
         }
     }
 }

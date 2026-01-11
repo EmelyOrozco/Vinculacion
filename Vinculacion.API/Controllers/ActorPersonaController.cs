@@ -8,7 +8,7 @@ namespace Vinculacion.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActorPersonaController : ControllerBase
+    public class ActorPersonaController : BaseController
     {
         private readonly IActorPersonaService _actorPersonaService;
         public ActorPersonaController(IActorPersonaService actorPersonaService)
@@ -20,12 +20,13 @@ namespace Vinculacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateActorPersona([FromBody] AddActorPersonaDto addActorPersonaDto)
         {
-            var result = await _actorPersonaService.AddActorPersonaAsync(addActorPersonaDto);
+            var usuarioId = UsuarioId;
+            var result = await _actorPersonaService.AddActorPersonaAsync(addActorPersonaDto, usuarioId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
-            return Ok(result.Data);
+            return Ok(result.Message);
         }
 
         [Authorize(Roles = "Superusuario, Usuario Consultor")]
@@ -56,7 +57,8 @@ namespace Vinculacion.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActorPersona(decimal id,[FromBody] UpdateActorPersonaDto dto)
         {
-            var result = await _actorPersonaService.UpdateActorPersonaAsync(id, dto);
+            var usuarioId = UsuarioId;
+            var result = await _actorPersonaService.UpdateActorPersonaAsync(id, dto, usuarioId);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Message);

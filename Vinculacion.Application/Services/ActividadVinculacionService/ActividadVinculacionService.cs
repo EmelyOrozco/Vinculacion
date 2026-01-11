@@ -1,4 +1,6 @@
-﻿using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
+﻿using System.Text.Json;
+using Vinculacion.Application.Contante;
+using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
@@ -16,36 +18,69 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUsersRepository _usersRepository;
         private readonly IEmailService _emailService;
-        
+        private readonly ITipoVinculacionRepository _tipoVinculacionRepository;
+
         public ActividadVinculacionService(IActividadVinculacionRepository actividadVinculacionRepository,
             IUnitOfWork unitOfWork,
             IUsersRepository usersRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            ITipoVinculacionRepository tipoVinculacionRepository)
         {
             _actividadVinculacionRepository = actividadVinculacionRepository;
             _unitOfWork = unitOfWork;
             _usersRepository = usersRepository;
             _emailService = emailService;
+            _tipoVinculacionRepository = tipoVinculacionRepository;
         }
 
-        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto actividadVinculacionDto)
+        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto dto,decimal usuarioId)
         {
-            var actividadVinculacion = actividadVinculacionDto.ToActividadVinculacionFromDto();
-
-            if (actividadVinculacionDto.Subtareas is not null)
+            if (!dto.TipoVinculacionId.HasValue)
             {
-                actividadVinculacion.Subtareas = new List<ActividadSubtareas>();
-                foreach (var subtareaDto in actividadVinculacionDto.Subtareas)
-                {
-                    actividadVinculacion.Subtareas.Add(subtareaDto.ToActividadSubtareasFromDto());
-
-                }
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "El tipo de vinculación es obligatorio para la actividad."
+                );
             }
-            var actividad = await _actividadVinculacionRepository.AddAsync(actividadVinculacion);
-            var result = await _unitOfWork.SaveChangesAsync();
-            
-            return OperationResult<ActividadVinculacionDto>.Success("Actividad Vinculacion agregada correctamente ", result);
+
+            var tipo = await _tipoVinculacionRepository
+                .GetByIdAsync(dto.TipoVinculacionId.Value);
+
+            if (tipo == null || tipo.EsProyecto)
+            {
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "No se pueden crear actividades con un tipo de vinculación de proyecto."
+                );
+            }
+
+            if (tipo == null || tipo.EsProyecto)
+            {
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "No se pueden crear actividades con un tipo de vinculación de proyecto."
+                );
+            }
+            var actividad = dto.ToActividadVinculacionFromDto();
+
+            actividad.EstadoId = DeterminarEstadoActividad(actividad);
+
+            actividad.FechaRegistro = DateTime.UtcNow;
+
+            await _actividadVinculacionRepository.AddAsync(actividad);
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Crear",
+                Entidad = "ActividadVinculacion",
+                EntidadId = null
+            });
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return OperationResult<ActividadVinculacionDto>
+                .Success("Actividad creada correctamente", dto);
         }
+
 
         public async Task<OperationResult<List<ActividadVinculacionDto>>> GetAllAsync()
         {
@@ -82,14 +117,45 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         }
 
 
-        public async Task<OperationResult<bool>> UpdateAsync(decimal id, ActividadVinculacionDto dto)
+        public async Task<OperationResult<bool>> UpdateAsync(decimal id, ActividadVinculacionDto dto, decimal usuarioId)
         {
             var result = await _actividadVinculacionRepository.GetByIdWithSubtareasAsync(id);
 
             if (!result.IsSuccess || result.Data == null)
                 return OperationResult<bool>.Failure("Actividad no encontrada");
 
-            var entity = result.Data;
+            var entity = result.Data as ActividadVinculacion;
+            if (entity == null)
+                return OperationResult<bool>.Failure("Actividad no encontrada");
+
+            var subtareasSnapshot = entity.Subtareas
+            .Select(s => new
+            {
+                s.SubtareaID,
+                s.TituloSubtarea,
+                s.Detalle,
+                s.Orden,
+                s.EstadoID,
+                s.FechaCompletado
+            })
+            .ToList();
+
+            var antes = JsonSerializer.Serialize(new
+            {
+                entity.ActorExternoId,
+                entity.RecintoId,
+                entity.TipoVinculacionId,
+                entity.PersonaId,
+                entity.EstadoId,
+                entity.TituloActividad,
+                entity.Modalidad,
+                entity.Lugar,
+                entity.FechaHoraEvento,
+                entity.Ambito,
+                entity.Sector,
+                Subtareas = subtareasSnapshot
+            });
+
 
             if (dto.ActorExternoId.HasValue && dto.ActorExternoId > 0)
                 entity.ActorExternoId = dto.ActorExternoId.Value;
@@ -98,13 +164,22 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 entity.RecintoId = dto.RecintoId.Value;
 
             if (dto.TipoVinculacionId.HasValue && dto.TipoVinculacionId > 0)
+            {
+                var tipo = await _tipoVinculacionRepository
+                    .GetByIdAsync(dto.TipoVinculacionId.Value);
+
+                if (tipo == null || tipo.EsProyecto)
+                {
+                    return OperationResult<bool>.Failure(
+                        "No se puede asignar un tipo de vinculación de proyecto a una actividad."
+                    );
+                }
+
                 entity.TipoVinculacionId = dto.TipoVinculacionId.Value;
+            }
 
             if (dto.PersonaId.HasValue && dto.PersonaId > 0)
                 entity.PersonaId = dto.PersonaId.Value;
-
-            if (dto.EstadoId.HasValue && dto.EstadoId > 0)
-                entity.EstadoId = dto.EstadoId.Value;
 
             if (!string.IsNullOrWhiteSpace(dto.TituloActividad))
                 entity.TituloActividad = dto.TituloActividad;
@@ -137,17 +212,65 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 }
             }
 
+            var subtareasDespues = entity.Subtareas
+            .Select(s => new
+            {
+                s.SubtareaID,
+                s.TituloSubtarea,
+                s.Detalle,
+                s.Orden,
+                s.EstadoID,
+                s.FechaCompletado
+            })
+            .ToList();
+
+            var despues = JsonSerializer.Serialize(new
+            {
+                entity.ActorExternoId,
+                entity.RecintoId,
+                entity.TipoVinculacionId,
+                entity.PersonaId,
+                entity.EstadoId,
+                entity.TituloActividad,
+                entity.Modalidad,
+                entity.Lugar,
+                entity.FechaHoraEvento,
+                entity.Ambito,
+                entity.Sector,
+                Subtareas = subtareasDespues
+            });
+
+            await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
+            {
+                UsuarioID = usuarioId,
+                FechaHora = DateTime.UtcNow,
+                Accion = "Actualizar",
+                Entidad = "ActividadVinculacion",
+                EntidadId = id,
+                DetalleAntes = antes,
+                DetalleDespues = despues
+            });
+
+            if (dto.EstadoId == EstadosActividad.Deshabilitado)
+            {
+                entity.EstadoId = EstadosActividad.Deshabilitado;
+            }
+            else
+            {
+                entity.EstadoId = DeterminarEstadoActividad(entity);
+            }
+
+
             await _unitOfWork.SaveChangesAsync();
 
             return OperationResult<bool>.Success("Actividad actualizada correctamente", true);
         }
 
-
-        public async Task ProcesarActividadesAsync(DateTime hoy)
+        public async Task EnviarAlertasActividadesAsync(DateTime hoy)
         {
             var actividades = await _actividadVinculacionRepository.GetActividadEstatusActivo();
 
-            foreach(var actividad in actividades)
+            foreach (var actividad in actividades)
             {
                 double? diasFaltantes = null;
 
@@ -161,35 +284,35 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
                 var titulo = FuncionesService.ObtenerTitulo("Actividad", diasFaltantes);
                 var body = $@"
-                <html>
-                <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
-                    <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
-                        <h2 style='color:#333;'>🔔 Actividad próxima a vencer</h2>
+                        <html>
+                        <body style='font-family: Arial, sans-serif; background-color:#f5f5f5; padding:20px;'>
+                            <div style='max-width:600px; background-color:#ffffff; padding:20px; border-radius:6px;'>
+                                <h2 style='color:#333;'>🔔 Actividad próxima a vencer</h2>
 
-                        <p>Hola,</p>
+                                <p>Hola,</p>
 
-                        <p>
-                            Te informamos que la actividad 
-                            <strong>{actividad.TituloActividad}</strong> tiene como fecha de finalización:
-                        </p>
+                                <p>
+                                    Te informamos que la actividad 
+                                    <strong>{actividad.TituloActividad}</strong> tiene como fecha de finalización:
+                                </p>
 
-                        <p style='font-size:16px;'>
-                            📅 <strong>{actividad.FechaHoraEvento:dd/MM/yyyy}</strong>
-                        </p>
+                                <p style='font-size:16px;'>
+                                    📅 <strong>{actividad.FechaHoraEvento:dd/MM/yyyy}</strong>
+                                </p>
 
-                        <p>
-                            Por favor, revisa el estado de la actividad y realiza las acciones correspondientes.
-                        </p>
+                                <p>
+                                    Por favor, revisa el estado de la actividad y realiza las acciones correspondientes.
+                                </p>
 
-                        <hr />
+                                <hr />
 
-                        <p style='font-size:12px; color:#777;'>
-                            Sistema de Vinculación Universitaria<br/>
-                            UNPHU
-                        </p>
-                    </div>
-                </body>
-                </html>";
+                                <p style='font-size:12px; color:#777;'>
+                                    Sistema de Vinculación Universitaria<br/>
+                                    UNPHU
+                                </p>
+                            </div>
+                        </body>
+                        </html>";
 
                 var correoUsuarios = await _usersRepository.GetCorreoUsuariosAlertas();
 
@@ -200,8 +323,58 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                         await _emailService.SendEmail(usuario.CorreoInstitucional, titulo, body);
                     }
                 }
-
             }
         }
+
+
+
+        public async Task ProcesarActividadesAsync(DateTime hoy)
+        {
+            var actividades = await _actividadVinculacionRepository.GetActividadEstatusActivo();
+
+            foreach (var actividad in actividades)
+            {
+                if (!actividad.FechaHoraEvento.HasValue)
+                    continue;
+
+                if (actividad.FechaHoraEvento.Value <= hoy)
+                {
+                    actividad.EstadoId = EstadosActividad.Finalizado;
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+
+        private bool ActividadEstaCompleta(ActividadVinculacion a)
+            {
+                return
+                    a.ActorExternoId.HasValue &&
+                    a.RecintoId.HasValue &&
+                    a.TipoVinculacionId.HasValue &&
+                    !string.IsNullOrWhiteSpace(a.TituloActividad) &&
+                    a.Modalidad.HasValue &&
+                    !string.IsNullOrWhiteSpace(a.Lugar) &&
+                    a.FechaHoraEvento.HasValue &&
+                    a.Ambito.HasValue &&
+                    a.Sector.HasValue;
+            }
+
+        private decimal DeterminarEstadoActividad(ActividadVinculacion actividad)
+        {
+            if (actividad.EstadoId == EstadosActividad.Deshabilitado)
+                return EstadosActividad.Deshabilitado;
+
+            if (actividad.FechaHoraEvento.HasValue &&
+                actividad.FechaHoraEvento.Value <= DateTime.UtcNow)
+                return EstadosActividad.Finalizado;
+
+            if (!ActividadEstaCompleta(actividad))
+                return EstadosActividad.Parcial;
+
+            return EstadosActividad.Activo;
+        }
+
     }
 }
