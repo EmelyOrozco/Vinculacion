@@ -216,9 +216,9 @@ namespace Vinculacion.Application.Services
             return await _queryRepository.ExecuteQuery<TipoColumnaDto>(DataType.ObtenerTipoDatoColumnaTipo, parameter, cancellationToken);
         }
 
-        public async Task<ArchivoDescargaDto/*(Stream, string)*/> GenerarPlantillaExcel(CancellationToken cancellationToken)
+        public async Task<ArchivoDescargaDto/*(Stream, string)*/> GenerarPlantillaExcel(TipoSubida tipoSubida, CancellationToken cancellationToken)
         {
-            var subidaMasiva = await GetSubidaAsync(1);
+            var subidaMasiva = await GetSubidaAsync((decimal)tipoSubida);
 
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Plantilla");
@@ -245,7 +245,7 @@ namespace Vinculacion.Application.Services
             return new ArchivoDescargaDto
             {
                 Contenido = memoryStream.ToArray(),
-                NombreArchivo = "Registro_Pasantia.xlsx",
+                NombreArchivo = $"Registro_{tipoSubida}.xlsx",
                 ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             }; //(stream, "Registro Pasantia" + ".xlsx");
         }

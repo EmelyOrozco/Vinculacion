@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos;
+using Vinculacion.Application.Enums;
 using Vinculacion.Application.Interfaces.Services;
 
 namespace Vinculacion.API.Controllers
@@ -39,9 +40,9 @@ namespace Vinculacion.API.Controllers
         /// Descarga plantilla Excel para subida.
         /// </summary>
         [HttpGet("plantilla")]
-        public async Task<IActionResult> DescargarPlantillaExcel(CancellationToken cancellationToken)
+        public async Task<IActionResult> DescargarPlantillaExcel(CancellationToken cancellationToken, TipoSubida tipoSubida)
         {
-            var archivo = await _subidaService.GenerarPlantillaExcel(cancellationToken);
+            var archivo = await _subidaService.GenerarPlantillaExcel(tipoSubida,cancellationToken);
 
             return File(archivo.Contenido, archivo.ContentType, archivo.NombreArchivo);
 

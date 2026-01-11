@@ -53,8 +53,6 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<PasantiaVinculacion> PasantiaVinculacion { get; set; }
 
-        public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -249,4 +247,4 @@ namespace Vinculacion.Persistence.Context
 
         }
     }
-}
+
