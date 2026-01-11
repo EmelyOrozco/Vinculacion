@@ -12,6 +12,7 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
                 ActorExternoID = dto.ActorExternoID,
                 PersonaID = dto.PersonaID,
                 RecintoID = dto.RecintoID,
+                TipoVinculacionID = dto.TipoVinculacionID,
                 TituloProyecto = dto.TituloProyecto,
                 DescripcionGeneral = dto.DescripcionGeneral,
                 FechaInicio = dto.FechaInicio,

@@ -27,6 +27,7 @@ namespace Vinculacion.Application.Services
         private readonly IValidator<AddActividadesToProyectoDto> _addActividadesValidator;
         private readonly IUsersRepository _usersRepository;
         private readonly IEmailService _emailService;
+        private readonly ITipoVinculacionRepository _tipoVinculacionRepository;
 
         public ProyectoService(
             IProyectoRepository proyectoRepository,
@@ -37,7 +38,8 @@ namespace Vinculacion.Application.Services
             IProyectoActividadRepository proyectoActividadRepository,
             IValidator<AddActividadesToProyectoDto> addActividadesValidator,
             IUsersRepository usersRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            ITipoVinculacionRepository tipoVinculacionRepository)
         {
             _proyectoRepository = proyectoRepository;
             _validator = validator;
@@ -48,6 +50,7 @@ namespace Vinculacion.Application.Services
             _addActividadesValidator = addActividadesValidator;
             _usersRepository = usersRepository;
             _emailService = emailService;
+            _tipoVinculacionRepository = tipoVinculacionRepository;
         }
 
         public async Task<OperationResult<AddProyectoDto>> AddProyectoAsync(AddProyectoDto request, decimal usuarioId)
@@ -60,6 +63,15 @@ namespace Vinculacion.Application.Services
                     validation.Errors.Select(e => e.ErrorMessage)
                 );
             }
+
+            var tipo = await _tipoVinculacionRepository.GetByIdAsync(request.TipoVinculacionID);
+            if (tipo == null || !tipo.EsProyecto)
+            {
+                return OperationResult<AddProyectoDto>.Failure(
+                    "Solo se permiten Pasantías o Servicio Social para proyectos."
+                );
+            }
+
             var entity = request.ToProyectoFromAddDto();
 
             entity.EstadoID = DeterminarEstadoProyecto(entity);
@@ -163,6 +175,18 @@ namespace Vinculacion.Application.Services
                 proyecto.PersonaID
             });
 
+            if (dto.TipoVinculacionID.HasValue)
+            {
+                var tipo = await _tipoVinculacionRepository
+                    .GetByIdAsync(dto.TipoVinculacionID.Value);
+
+                if (tipo == null || !tipo.EsProyecto)
+                {
+                    return OperationResult<bool>.Failure(
+                        "No se puede asignar un tipo de vinculación que no sea de proyecto."
+                    );
+                }
+            }
 
             ProyectoVinculacionUpdateExtention.UpdateFromDto(proyecto, dto);
 

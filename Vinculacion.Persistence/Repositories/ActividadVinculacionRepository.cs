@@ -65,23 +65,16 @@ namespace Vinculacion.Persistence.Repositories
             return actividadesActivas;
         }
 
-        public async Task<List<ActividadVinculacion>>GetActividadesDisponiblesByActorExterno(decimal actorExternoId)
+        public async Task<List<ActividadVinculacion>> GetActividadesDisponiblesByActorExterno(decimal actorExternoId)
         {
             return await _context.ActividadVinculacion
-                .Join(
-                    _context.TipoVinculacion,
-                    a => a.TipoVinculacionId,
-                    tv => tv.TipoVinculacionID,
-                    (a, tv) => new { Actividad = a, Tipo = tv }
-                )
-                .Where(x =>
-                    x.Actividad.ActorExternoId == actorExternoId &&
-                    x.Tipo.EsProyecto == true &&
+                .Where(a =>
+                    a.ActorExternoId == actorExternoId &&
                     !_context.ProyectoActividad
-                        .Any(pa => pa.ActividadID == x.Actividad.ActividadId)
+                        .Any(pa => pa.ActividadID == a.ActividadId)
                 )
-                .Select(x => x.Actividad)
                 .ToListAsync();
         }
+
     }
 }

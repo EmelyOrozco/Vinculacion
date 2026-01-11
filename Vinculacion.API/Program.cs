@@ -117,6 +117,9 @@ builder.Services.AddHostedService<AlertasBackgroundService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
 
+builder.Services.AddScoped<ITipoVinculacionRepository, TipoVinculacionRepository>();
+builder.Services.AddScoped<ITipoVinculacionService, TipoVinculacionService>();
+
 builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

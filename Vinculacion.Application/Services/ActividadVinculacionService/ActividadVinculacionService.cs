@@ -18,22 +18,46 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUsersRepository _usersRepository;
         private readonly IEmailService _emailService;
-        
+        private readonly ITipoVinculacionRepository _tipoVinculacionRepository;
+
         public ActividadVinculacionService(IActividadVinculacionRepository actividadVinculacionRepository,
             IUnitOfWork unitOfWork,
             IUsersRepository usersRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            ITipoVinculacionRepository tipoVinculacionRepository)
         {
             _actividadVinculacionRepository = actividadVinculacionRepository;
             _unitOfWork = unitOfWork;
             _usersRepository = usersRepository;
             _emailService = emailService;
+            _tipoVinculacionRepository = tipoVinculacionRepository;
         }
 
-        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(
-    ActividadVinculacionDto dto,
-    decimal usuarioId)
+        public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto dto,decimal usuarioId)
         {
+            if (!dto.TipoVinculacionId.HasValue)
+            {
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "El tipo de vinculación es obligatorio para la actividad."
+                );
+            }
+
+            var tipo = await _tipoVinculacionRepository
+                .GetByIdAsync(dto.TipoVinculacionId.Value);
+
+            if (tipo == null || tipo.EsProyecto)
+            {
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "No se pueden crear actividades con un tipo de vinculación de proyecto."
+                );
+            }
+
+            if (tipo == null || tipo.EsProyecto)
+            {
+                return OperationResult<ActividadVinculacionDto>.Failure(
+                    "No se pueden crear actividades con un tipo de vinculación de proyecto."
+                );
+            }
             var actividad = dto.ToActividadVinculacionFromDto();
 
             actividad.EstadoId = DeterminarEstadoActividad(actividad);
@@ -140,7 +164,19 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 entity.RecintoId = dto.RecintoId.Value;
 
             if (dto.TipoVinculacionId.HasValue && dto.TipoVinculacionId > 0)
+            {
+                var tipo = await _tipoVinculacionRepository
+                    .GetByIdAsync(dto.TipoVinculacionId.Value);
+
+                if (tipo == null || tipo.EsProyecto)
+                {
+                    return OperationResult<bool>.Failure(
+                        "No se puede asignar un tipo de vinculación de proyecto a una actividad."
+                    );
+                }
+
                 entity.TipoVinculacionId = dto.TipoVinculacionId.Value;
+            }
 
             if (dto.PersonaId.HasValue && dto.PersonaId > 0)
                 entity.PersonaId = dto.PersonaId.Value;
