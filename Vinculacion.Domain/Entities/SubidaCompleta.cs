@@ -5,6 +5,8 @@ namespace Vinculacion.Domain.Entities
     {
         public decimal SubidaId { get; set; }
 
+        public decimal TipoSubida { get; set; }
+
         public string Procedure { get; set; } = null!;
 
         public string UserDefinedType { get; set; } = null!;

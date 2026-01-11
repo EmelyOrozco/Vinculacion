@@ -11,5 +11,7 @@ namespace Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRe
         Task<OperationResult<ActividadVinculacion>> GetByIdWithSubtareasAsync(decimal id);
         Task<List<ActividadVinculacion>>GetActividadesDisponiblesByActorExterno(decimal actorExternoId);
         Task<List<ActividadVinculacion>> GetActividadEstatusActivo();
+
+        Task<List<ActividadVinculacion>> GetCharlasActivasFinalizadasAsync();
     }
 }

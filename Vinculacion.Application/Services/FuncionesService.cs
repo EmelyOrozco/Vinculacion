@@ -145,6 +145,15 @@ namespace Vinculacion.Application.Services
             return $"{tipo} próximo a vencer";
         }
 
+        public static readonly string[] FechasDateTime =
+        {
+            "M/d/yyyy h:mm:ss tt",  
+            "MM/dd/yyyy hh:mm:ss tt",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-ddTHH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss",
+            "M/d/yyyy"
+        };
 
     }
 }

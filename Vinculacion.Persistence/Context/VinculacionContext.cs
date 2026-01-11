@@ -47,6 +47,14 @@ namespace Vinculacion.Persistence.Context
         public DbSet<ProyectoVinculacion> ProyectoVinculacion { get; set; }
         public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
 
+        public DbSet<ActorEmpresaClasificacion> ActorEmpresaClasificacion { get; set; }
+
+        public DbSet<CharlaVinculacion> CharlaVinculacion { get; set; }
+
+        public DbSet<PasantiaVinculacion> PasantiaVinculacion { get; set; }
+
+        public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -220,6 +228,23 @@ namespace Vinculacion.Persistence.Context
                       .IsRequired()
                       .HasMaxLength(100);
             });
+
+
+            modelBuilder.Entity<CharlaVinculacion>()
+                .HasKey(e => e.CharlaParticipanteID);
+
+            modelBuilder.Entity<CharlaVinculacion>()
+               .HasKey(e => e.CharlaID);
+
+            modelBuilder.Entity<PasantiaVinculacion>()
+                .HasKey(e => e.PasantiaVinculacionId);
+
+            modelBuilder.Entity<PasantiaVinculacion>()
+                .HasKey(e => e.PasantiaID);
+
+            modelBuilder.Entity<TipoVinculacion>()
+                .HasKey(e => e.TipoVinculacionID);
+        }
 
 
         }

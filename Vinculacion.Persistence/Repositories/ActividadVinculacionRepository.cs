@@ -65,6 +65,26 @@ namespace Vinculacion.Persistence.Repositories
             return actividadesActivas;
         }
 
+        public async Task<List<ActividadVinculacion>> GetCharlasActivasFinalizadasAsync()
+        {
+            var actividadesCharla = await _context.ActividadVinculacion
+                .Join(_context.Estado,
+                    a => a.EstadoId,
+                    e => e.EstadoID,
+                    (a, e) => new { a, e })
+                .Join(_context.TipoVinculacion,
+                    ae => ae.a.TipoVinculacionId,
+                    t => t.TipoVinculacionID,
+                    (ae, t) => new { ae.a, ae.e, t })
+                .Where(x =>
+                    x.t.Descripcion == "Charla" &&
+                    x.e.TablaEstado == "ActividadVinculacion" &&
+                    (x.e.Descripcion == "Activo" || x.e.Descripcion == "Finalizado"))
+                .Select(x => x.a)
+                .ToListAsync();
+
+            return actividadesCharla;
+
         public async Task<List<ActividadVinculacion>> GetActividadesDisponiblesByActorExterno(decimal actorExternoId)
         {
             return await _context.ActividadVinculacion

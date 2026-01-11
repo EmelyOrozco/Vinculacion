@@ -1,3 +1,4 @@
+﻿
 ﻿namespace Vinculacion.Domain.Entities
 {
     public class TipoVinculacion

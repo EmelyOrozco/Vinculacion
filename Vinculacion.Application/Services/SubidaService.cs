@@ -1,8 +1,8 @@
 ﻿using ClosedXML.Excel;
 using System.Data;
 using System.Globalization;
-using System.IO;
 using Vinculacion.Application.Dtos;
+using Vinculacion.Application.Enums;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Services;
 using Vinculacion.Domain.Constants;
@@ -15,17 +15,27 @@ namespace Vinculacion.Application.Services
         private readonly ISubidaDetalleRepository _subidaDetalleRepository;
         private readonly ISubidaRepository _subidaRepository;
         private readonly IQueryRepository _queryRepository;
+        private readonly IPasantiaService _pasantiaService;
+        private readonly ICharlaService _charlaService;
 
-        public SubidaService(ISubidaDetalleRepository subidaDetalleRepository, ISubidaRepository subidaRepository, IQueryRepository queryRepository)
+        public SubidaService(ISubidaDetalleRepository subidaDetalleRepository,
+            ISubidaRepository subidaRepository, 
+            IQueryRepository queryRepository,
+            IPasantiaService pasantiaService,
+            ICharlaService charlaService)
         {
             _subidaDetalleRepository = subidaDetalleRepository;
             _subidaRepository = subidaRepository;
             _queryRepository = queryRepository;
+            _pasantiaService = pasantiaService;
+            _charlaService = charlaService;
         }
-
-        public async Task EjecutarSubida(Stream archivo, CancellationToken cancellationToken)
+        
+        public async Task EjecutarSubida(TipoSubida tipoSubida,decimal contextoId, Stream archivo, CancellationToken cancellationToken)
         {
-            var subida = await GetSubidaAsync(1);
+            var contexto = await GetTipoVinculacion((decimal)tipoSubida, contextoId);
+
+            var subida = await GetSubidaAsync((decimal)tipoSubida);
 
             if (subida is null)
             {
@@ -48,27 +58,27 @@ namespace Vinculacion.Application.Services
                      IsStructured = true,
                      UdttName = subida.UserDefinedType
                  },
-                 //new()
-                 //{
-                 //    Name = "UsuInicioSesion",
-                 //    Value = _currentUser.Id ?? throw new UnauthorizedAccessException()
-                 //}
+                 new()
+                 {
+                     Name = "Id",
+                     Value = contexto
+                 }
                 };
 
             await _queryRepository.ExecuteStoredProcedure(subida.Procedure,storeProcedureParameters,cancellationToken);
         }
 
 
-        public async Task<SubidaCompleta> GetSubidaAsync(decimal subidaId)
+        public async Task<SubidaCompleta> GetSubidaAsync(decimal tipoSubida)
         {
-            var subida = await _subidaRepository.GetSubida(subidaId);
+            var subida = await _subidaRepository.GetSubida(tipoSubida);
 
             if(subida is null)
             {
                 throw new Exception("La subida no existe");
             }
 
-            var detalle = await _subidaDetalleRepository.GetBySubidaIdAsync(subidaId);
+            var detalle = await _subidaDetalleRepository.GetBySubidaIdAsync(subida.SubidaId);
 
             return new SubidaCompleta
             {
@@ -78,6 +88,16 @@ namespace Vinculacion.Application.Services
                 Parametro = subida.Parametro,
                 Detalle = detalle
 
+            };
+        }
+
+        public async Task<decimal> GetTipoVinculacion(decimal tipoSubida, decimal contextoId)
+        {
+            return tipoSubida switch
+            {
+                (decimal)TipoSubida.Pasantia => await _pasantiaService.GetPasantiasActivasFinalizadas(contextoId),
+                (decimal)TipoSubida.Charla => await _charlaService.GetCharlasActivasFinalizadas(contextoId),
+                _ => throw new InvalidOperationException("Tipo de subida no soportado")
             };
         }
 
@@ -151,10 +171,33 @@ namespace Vinculacion.Application.Services
         {
             "int" => int.TryParse(value, out int intValue) ? intValue : null,
             "decimal" => decimal.TryParse(value, out decimal decimalValue) ? decimalValue : null,
-            "date" => DateTime.TryParseExact(value, Formatos.Fechas, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue) ? dateValue : null,
-            "datetime" => DateTime.TryParseExact(value, Formatos.Fechas, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue) ? dateValue : null,
+            "date" => DateTime.TryParseExact(value, Formatos.Fechas, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue) ? dateValue : DBNull.Value,
+            //"datetime" => DateTime.TryParseExact(value, Formatos.Fechas, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateValue) ? dateValue : DBNull.Value,
+            "datetime" =>
+            string.IsNullOrWhiteSpace(value)
+                ? DateTime.Now
+                : DateTime.TryParseExact(
+                      value.Trim(),
+                      FuncionesService.FechasDateTime,
+                      CultureInfo.InvariantCulture,
+                      DateTimeStyles.None,
+                      out DateTime dateValue
+                  )
+                    ? dateValue
+                    : DateTime.Now,
+
             "varchar" => value,
-            "bit" => bool.TryParse(value, out bool boolValue) ? boolValue : null,
+            "bit" => value.Trim().ToLower() switch
+            {
+                "si" => true,
+                "sí" => true,
+                "true" => true,
+                "1" => true,
+                "no" => false,
+                "false" => false,
+                "0" => false,
+                _ => DBNull.Value
+            },//"bit" => bool.TryParse(value, out bool boolValue) ? boolValue : DBNull.Value,
             "bigint" => long.TryParse(value, out long longValue) ? longValue : null,
             "smallint" => short.TryParse(value, out short shortValue) ? shortValue : null,
             "float" => float.TryParse(value, out float floatValue) ? floatValue : null,
