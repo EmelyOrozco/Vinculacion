@@ -507,8 +507,6 @@ namespace Vinculacion.Application.Services
                 !string.IsNullOrWhiteSpace(p.TituloProyecto) &&
                 p.FechaInicio.HasValue &&
                 p.FechaFin.HasValue &&
-                p.Ambito.HasValue &&
-                p.Sector.HasValue &&
                 p.RecintoID.HasValue;
         }
 
@@ -526,8 +524,5 @@ namespace Vinculacion.Application.Services
 
             return EstadosProyecto.Activo;
         }
-
-
-
     }
 }

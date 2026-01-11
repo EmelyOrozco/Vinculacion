@@ -25,12 +25,6 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
             if (dto.FechaFin.HasValue)
                 entity.FechaFin = dto.FechaFin.Value;
 
-            if (dto.Ambito.HasValue && dto.Ambito > 0)
-                entity.Ambito = dto.Ambito.Value;
-
-            if (dto.Sector.HasValue && dto.Sector > 0)
-                entity.Sector = dto.Sector.Value;
-
             if (dto.TipoVinculacionID.HasValue)
                 entity.TipoVinculacionID = dto.TipoVinculacionID.Value;
 

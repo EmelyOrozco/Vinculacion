@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
-using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
-using System.Security.Claims;
 
 namespace Vinculacion.API.Controllers
 {

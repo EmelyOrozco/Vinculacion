@@ -20,8 +20,6 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
                 FechaModificacion = entity.FechaModificacion,
                 FechaInicio = entity.FechaInicio,
                 FechaFin = entity.FechaFin,
-                Ambito = entity.Ambito,
-                Sector = entity.Sector,
                 ActividadesIDs = entity.ProyectoActividades
                     .Select(x => x.ActividadID)
                     .ToList()

@@ -53,7 +53,6 @@ namespace Vinculacion.Persistence.Context
 
         public DbSet<PasantiaVinculacion> PasantiaVinculacion { get; set; }
 
-        public DbSet<TipoVinculacion> TipoVinculacion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -244,9 +243,6 @@ namespace Vinculacion.Persistence.Context
 
             modelBuilder.Entity<TipoVinculacion>()
                 .HasKey(e => e.TipoVinculacionID);
-        }
-
-
-        }
+        }     
     }
 }

@@ -14,15 +14,13 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
                 RecintoId = entity.RecintoId,
                 TipoVinculacionId = entity.TipoVinculacionId,
                 PersonaId = entity.PersonaId,
-                EstadoId = entity.EstadoId,
+                //EstadoId = entity.EstadoId,
                 TituloActividad = entity.TituloActividad,
                 DescripcionActividad = entity.DescripcionActividad,
                 Modalidad = entity.Modalidad,
                 Lugar = entity.Lugar,
                 FechaHoraEvento = entity.FechaHoraEvento,
                 FechaRegistro = entity.FechaRegistro,
-                Ambito = entity.Ambito,
-                Sector = entity.Sector,
 
                 Subtareas = entity.Subtareas?
                     .OrderBy(s => s.Orden)

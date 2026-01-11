@@ -19,9 +19,6 @@
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFin { get; set; }
 
-        public decimal? Ambito { get; set; }
-        public decimal? Sector { get; set; }
-
         public List<decimal> ActividadesIDs { get; set; } = new();
     }
 }

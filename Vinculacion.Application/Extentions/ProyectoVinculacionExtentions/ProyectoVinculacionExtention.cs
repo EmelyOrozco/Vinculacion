@@ -17,8 +17,6 @@ namespace Vinculacion.Application.Extentions.ProyectoVinculacionExtentions
                 DescripcionGeneral = dto.DescripcionGeneral,
                 FechaInicio = dto.FechaInicio,
                 FechaFin = dto.FechaFin,
-                Ambito = dto.Ambito,
-                Sector = dto.Sector,
                 FechaRegistro = DateTime.Now
             };
         }

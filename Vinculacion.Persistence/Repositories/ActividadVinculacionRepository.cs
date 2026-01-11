@@ -84,7 +84,7 @@ namespace Vinculacion.Persistence.Repositories
                 .ToListAsync();
 
             return actividadesCharla;
-
+        }
         public async Task<List<ActividadVinculacion>> GetActividadesDisponiblesByActorExterno(decimal actorExternoId)
         {
             return await _context.ActividadVinculacion
@@ -95,6 +95,5 @@ namespace Vinculacion.Persistence.Repositories
                 )
                 .ToListAsync();
         }
-
     }
 }

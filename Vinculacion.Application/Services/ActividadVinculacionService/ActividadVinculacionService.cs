@@ -35,15 +35,14 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
         public async Task<OperationResult<ActividadVinculacionDto>> AddActividadVinculacion(ActividadVinculacionDto dto,decimal usuarioId)
         {
-            if (!dto.TipoVinculacionId.HasValue)
+            if (dto.TipoVinculacionId <= 0)
             {
                 return OperationResult<ActividadVinculacionDto>.Failure(
                     "El tipo de vinculación es obligatorio para la actividad."
                 );
             }
 
-            var tipo = await _tipoVinculacionRepository
-                .GetByIdAsync(dto.TipoVinculacionId.Value);
+            var tipo = await _tipoVinculacionRepository.GetByIdAsync(dto.TipoVinculacionId);
 
             if (tipo == null || tipo.EsProyecto)
             {
@@ -52,12 +51,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 );
             }
 
-            if (tipo == null || tipo.EsProyecto)
-            {
-                return OperationResult<ActividadVinculacionDto>.Failure(
-                    "No se pueden crear actividades con un tipo de vinculación de proyecto."
-                );
-            }
             var actividad = dto.ToActividadVinculacionFromDto();
 
             actividad.EstadoId = DeterminarEstadoActividad(actividad);
@@ -72,7 +65,7 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 FechaHora = DateTime.UtcNow,
                 Accion = "Crear",
                 Entidad = "ActividadVinculacion",
-                EntidadId = null
+                EntidadId = actividad.ActividadId
             });
 
             await _unitOfWork.SaveChangesAsync();
@@ -151,22 +144,20 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 entity.Modalidad,
                 entity.Lugar,
                 entity.FechaHoraEvento,
-                entity.Ambito,
-                entity.Sector,
                 Subtareas = subtareasSnapshot
             });
 
 
-            if (dto.ActorExternoId.HasValue && dto.ActorExternoId > 0)
-                entity.ActorExternoId = dto.ActorExternoId.Value;
+            if (dto.ActorExternoId > 0)
+                entity.ActorExternoId = dto.ActorExternoId;
 
             if (dto.RecintoId.HasValue && dto.RecintoId > 0)
                 entity.RecintoId = dto.RecintoId.Value;
 
-            if (dto.TipoVinculacionId.HasValue && dto.TipoVinculacionId > 0)
+            if (dto.TipoVinculacionId > 0)
             {
                 var tipo = await _tipoVinculacionRepository
-                    .GetByIdAsync(dto.TipoVinculacionId.Value);
+                    .GetByIdAsync(dto.TipoVinculacionId);
 
                 if (tipo == null || tipo.EsProyecto)
                 {
@@ -175,11 +166,12 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                     );
                 }
 
-                entity.TipoVinculacionId = dto.TipoVinculacionId.Value;
+                entity.TipoVinculacionId = dto.TipoVinculacionId;
             }
 
-            if (dto.PersonaId.HasValue && dto.PersonaId > 0)
-                entity.PersonaId = dto.PersonaId.Value;
+
+            if (dto.PersonaId > 0)
+                entity.PersonaId = dto.PersonaId;
 
             if (!string.IsNullOrWhiteSpace(dto.TituloActividad))
                 entity.TituloActividad = dto.TituloActividad;
@@ -195,12 +187,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             if (dto.FechaHoraEvento.HasValue)
                 entity.FechaHoraEvento = dto.FechaHoraEvento;
-
-            if (dto.Ambito.HasValue && dto.Ambito > 0)
-                entity.Ambito = dto.Ambito.Value;
-
-            if (dto.Sector.HasValue && dto.Sector > 0)
-                entity.Sector = dto.Sector.Value;
 
             if (dto.Subtareas != null)
             {
@@ -235,8 +221,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 entity.Modalidad,
                 entity.Lugar,
                 entity.FechaHoraEvento,
-                entity.Ambito,
-                entity.Sector,
                 Subtareas = subtareasDespues
             });
 
@@ -251,14 +235,14 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 DetalleDespues = despues
             });
 
-            if (dto.EstadoId == EstadosActividad.Deshabilitado)
-            {
-                entity.EstadoId = EstadosActividad.Deshabilitado;
-            }
-            else
-            {
-                entity.EstadoId = DeterminarEstadoActividad(entity);
-            }
+            //if (dto.EstadoId == EstadosActividad.Deshabilitado)
+            //{
+            //    entity.EstadoId = EstadosActividad.Deshabilitado;
+            //}
+            //else
+            //{
+            //    entity.EstadoId = DeterminarEstadoActividad(entity);
+            //}
 
 
             await _unitOfWork.SaveChangesAsync();
@@ -349,16 +333,14 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
         private bool ActividadEstaCompleta(ActividadVinculacion a)
             {
-                return
-                    a.ActorExternoId.HasValue &&
-                    a.RecintoId.HasValue &&
-                    a.TipoVinculacionId.HasValue &&
-                    !string.IsNullOrWhiteSpace(a.TituloActividad) &&
-                    a.Modalidad.HasValue &&
-                    !string.IsNullOrWhiteSpace(a.Lugar) &&
-                    a.FechaHoraEvento.HasValue &&
-                    a.Ambito.HasValue &&
-                    a.Sector.HasValue;
+            return
+                a.ActorExternoId > 0 &&
+                a.RecintoId.HasValue &&
+                a.TipoVinculacionId > 0 &&
+                !string.IsNullOrWhiteSpace(a.TituloActividad) &&
+                a.Modalidad.HasValue &&
+                !string.IsNullOrWhiteSpace(a.Lugar) &&
+                a.FechaHoraEvento.HasValue;
             }
 
         private decimal DeterminarEstadoActividad(ActividadVinculacion actividad)

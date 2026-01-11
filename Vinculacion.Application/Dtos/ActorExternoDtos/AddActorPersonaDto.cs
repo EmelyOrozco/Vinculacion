@@ -11,7 +11,7 @@
 
         public string Correo { get; set; }
 
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
 
         public decimal Sexo { get; set; }
 

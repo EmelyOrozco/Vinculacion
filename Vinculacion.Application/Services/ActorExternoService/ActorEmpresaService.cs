@@ -54,7 +54,7 @@ namespace Vinculacion.Application.Services.ActorExternoService
                 return OperationResult<AddActorEmpresaDto>.Failure("Debe seleccionar al menos una clasificación",null);
             }
 
-            if (addActorEmpresaDto.TipoIdentificacion != 0)
+            if (addActorEmpresaDto.TipoIdentificacion != 0 && addActorEmpresaDto.TipoIdentificacion is not null)
             {
                 bool validarIdentificacion = FuncionesService.ValidarIdentificacion(addActorEmpresaDto.TipoIdentificacion, addActorEmpresaDto.IdentificacionNumero);
 

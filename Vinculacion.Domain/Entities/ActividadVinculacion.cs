@@ -5,13 +5,13 @@ namespace Vinculacion.Domain.Entities
     {
         public decimal ActividadId { get; set; }
 
-        public decimal? ActorExternoId { get; set; }
+        public decimal ActorExternoId { get; set; }
 
         public decimal? RecintoId { get; set; }
 
-        public decimal? TipoVinculacionId { get; set; }
+        public decimal TipoVinculacionId { get; set; }
 
-        public decimal? PersonaId { get; set; }
+        public decimal PersonaId { get; set; }
 
         public decimal EstadoId { get; set; }
 
@@ -28,10 +28,6 @@ namespace Vinculacion.Domain.Entities
         public DateTime FechaRegistro { get; set; }
 
         public DateTime? FechaModificacion { get; set; }
-
-        public decimal? Ambito { get; set; }
-
-        public decimal? Sector { get; set; }
 
         public ICollection<ActividadSubtareas> Subtareas { get; set; } = new List<ActividadSubtareas>();
     }
