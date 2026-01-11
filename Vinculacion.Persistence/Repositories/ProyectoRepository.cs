@@ -38,5 +38,27 @@ namespace Vinculacion.Persistence.Repositories
 
             return proyectosActivos;
         }
+
+        public async Task<List<ProyectoVinculacion>> GetPasantiasActivasFinalizadasAsync()
+        {
+            var actividadesCharla = await _context.ProyectoVinculacion
+                .Join(_context.Estado,
+                    a => a.EstadoID,
+                    e => e.EstadoID,
+                    (a, e) => new { a, e })
+                .Join(_context.TipoVinculacion,
+                    ae => ae.a.TipoVinculacionID,
+                    t => t.TipoVinculacionID,
+                    (ae, t) => new { ae.a, ae.e, t })
+                .Where(x =>
+                    x.t.Descripcion == "Pasantía" &&
+                    x.e.TablaEstado == "ProyectoVinculacion" &&
+                    (x.e.Descripcion == "Activo" || x.e.Descripcion == "Finalizado"))
+                .Select(x => x.a)
+                .ToListAsync();
+
+            return actividadesCharla;
+        }
+
     }
 }

@@ -28,8 +28,8 @@ namespace Vinculacion.Domain.Entities
 
         public string? CorreoResponsable { get; set; }
 
-        public DateTime FechaRegistro { get; set; }
+        public DateTime? FechaRegistro { get; set; }
 
-        public DateTime FechaActualizacion { get; set; }
+        public DateTime? FechaActualizacion { get; set; }
     }
 }

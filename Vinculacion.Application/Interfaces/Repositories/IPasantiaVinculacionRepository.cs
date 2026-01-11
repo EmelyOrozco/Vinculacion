@@ -2,7 +2,7 @@
 
 namespace Vinculacion.Application.Interfaces.Repositories
 {
-    public interface ICharlaVinculacionRepository: IBaseRepository<CharlaVinculacion>
+    public interface IPasantiaVinculacionRepository: IBaseRepository<PasantiaVinculacion>
     {
     }
 }

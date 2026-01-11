@@ -245,4 +245,4 @@ namespace Vinculacion.Persistence.Context
                 .HasKey(e => e.TipoVinculacionID);
         }     
     }
-}
+

@@ -111,16 +111,18 @@ builder.Services.AddScoped<IDocumentoAdjuntoRepository, DocumentoAdjuntoReposito
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IDocumentoAdjuntoService, DocumentoAdjuntoService>();
 
-builder.Services.AddScoped<IAlertasService, AlertasService>();
-builder.Services.AddHostedService<AlertasBackgroundService>();
+//builder.Services.AddScoped<IAlertasService, AlertasService>();
+//builder.Services.AddHostedService<AlertasBackgroundService>();
 
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
 
 builder.Services.AddScoped<ICharlaVinculacionRepository, CharlaVinculacionRepository>();
 builder.Services.AddTransient<ICharlaService, CharlaService>();
+builder.Services.AddScoped<ICharlaVinculacionRepository, CharlaVinculacionRepository>();
 
-builder.Services.AddScoped<IPasantiaService, PasantiaService>();
+builder.Services.AddTransient<IPasantiaService, PasantiaService>();
+builder.Services.AddScoped<IPasantiaVinculacionRepository, PasantiaVinculacionRepository>();
 builder.Services.AddScoped<ITipoVinculacionRepository, TipoVinculacionRepository>();
 builder.Services.AddScoped<ITipoVinculacionService, TipoVinculacionService>();
 
