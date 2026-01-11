@@ -9,9 +9,9 @@ namespace Vinculacion.Domain.Entities
 
         public decimal ActividadID { get; set; }
 
-        public decimal? EstadoID { get; set; }
+        public decimal EstadoID { get; set; }
 
-        public string? TituloSubtarea { get; set; }
+        public string TituloSubtarea { get; set; }
 
         public string? Detalle { get; set; }
 

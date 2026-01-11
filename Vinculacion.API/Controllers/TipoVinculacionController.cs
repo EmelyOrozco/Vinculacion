@@ -20,5 +20,13 @@ namespace Vinculacion.API.Controllers
             var tipos = await _tipoVinculacionService.GetTiposProyectoAsync();
             return Ok(tipos);
         }
+
+        [HttpGet("actividades")]
+        public async Task<IActionResult> GetTiposActividad()
+        {
+            var tipos = await _tipoVinculacionService.GetTiposActividadAsync();
+            return Ok(tipos);
+        }
+
     }
 }

@@ -1,7 +1,6 @@
-﻿
-namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas
+﻿namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtareas
 {
-    public class ActividadVinculacionDto
+    public class ResponseActividadVinculacionDto
     {
         public decimal ActorExternoId { get; set; }
 
@@ -9,6 +8,7 @@ namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtare
 
         public decimal TipoVinculacionId { get; set; }
 
+        public decimal EstadoID { get; set; }
         public decimal PersonaId { get; set; }
 
         public string? TituloActividad { get; set; }
@@ -23,6 +23,6 @@ namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtare
 
         public DateTime FechaRegistro { get; set; }
 
-        public List<ActividadSubtareaDto>? Subtareas { get; set; } 
+        public List<ActividadSubtareaDto>? Subtareas { get; set; }
     }
 }

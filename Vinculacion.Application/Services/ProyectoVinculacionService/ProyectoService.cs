@@ -169,8 +169,6 @@ namespace Vinculacion.Application.Services
                 proyecto.DescripcionGeneral,
                 proyecto.FechaInicio,
                 proyecto.FechaFin,
-                proyecto.Ambito,
-                proyecto.Sector,
                 proyecto.RecintoID,
                 proyecto.PersonaID
             });
@@ -212,8 +210,6 @@ namespace Vinculacion.Application.Services
                 proyecto.DescripcionGeneral,
                 proyecto.FechaInicio,
                 proyecto.FechaFin,
-                proyecto.Ambito,
-                proyecto.Sector,
                 proyecto.RecintoID,
                 proyecto.PersonaID
             });

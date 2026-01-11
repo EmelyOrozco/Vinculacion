@@ -14,6 +14,7 @@ namespace Vinculacion.Persistence.Repositories
 
         public async Task<bool> ActorPersonaExists(string Identificacion)
         {
+            if (string.IsNullOrWhiteSpace(Identificacion)) return false;
             return await _context.ActorPersona.AnyAsync(e => e.IdentificacionNumero == Identificacion);
         }
 

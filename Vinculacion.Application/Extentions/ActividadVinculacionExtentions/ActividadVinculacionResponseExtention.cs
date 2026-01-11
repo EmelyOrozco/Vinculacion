@@ -5,16 +5,16 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
 {
     public static class ActividadVinculacionResponseExtention
     {
-        public static ActividadVinculacionDto ToActividadVinculacionDto(
+        public static ResponseActividadVinculacionDto ToActividadVinculacionDto(
     this ActividadVinculacion entity)
         {
-            return new ActividadVinculacionDto
+            return new ResponseActividadVinculacionDto
             {
                 ActorExternoId = entity.ActorExternoId,
                 RecintoId = entity.RecintoId,
                 TipoVinculacionId = entity.TipoVinculacionId,
                 PersonaId = entity.PersonaId,
-                //EstadoId = entity.EstadoId,
+                EstadoID = entity.EstadoId,
                 TituloActividad = entity.TituloActividad,
                 DescripcionActividad = entity.DescripcionActividad,
                 Modalidad = entity.Modalidad,
@@ -24,8 +24,9 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
 
                 Subtareas = entity.Subtareas?
                     .OrderBy(s => s.Orden)
-                    .Select(s => new ActividadSubtareasDto
+                    .Select(s => new ActividadSubtareaDto
                     {
+                        SubtareaID = s.SubtareaID,     
                         ActividadID = s.ActividadID,
                         EstadoID = s.EstadoID,
                         TituloSubtarea = s.TituloSubtarea,

@@ -5,11 +5,11 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
 {
     public static class ActividadSubtareasExtentions
     {
-        public static ActividadSubtareas ToActividadSubtareasFromDto(this ActividadSubtareasDto actividadSubtareasDto)
+        public static ActividadSubtareas ToActividadSubtareasFromDto(this ActividadSubtareaDto actividadSubtareasDto)
         {
             return new ActividadSubtareas
             {
-                ActividadID = actividadSubtareasDto.ActividadID,
+                SubtareaID = actividadSubtareasDto.SubtareaID,
                 EstadoID = actividadSubtareasDto.EstadoID,
                 TituloSubtarea = actividadSubtareasDto.TituloSubtarea,
                 Detalle = actividadSubtareasDto.Detalle,

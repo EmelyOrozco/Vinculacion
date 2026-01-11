@@ -29,7 +29,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Message);
         }
 
-        [Authorize(Roles = "Superusuario, Usuario Consultor")]
+        [Authorize(Roles = "Superusuario, Usuario Consultor, Usuario Final")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -41,7 +41,7 @@ namespace Vinculacion.API.Controllers
             return Ok(result.Data);
         }
 
-        [Authorize(Roles = "Superusuario, Usuario Consultor")]
+        [Authorize(Roles = "Superusuario, Usuario Consultor, Usuario Final")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(decimal id)
         {
@@ -65,6 +65,5 @@ namespace Vinculacion.API.Controllers
 
             return Ok(result.Message);
         }
-
     }
 }

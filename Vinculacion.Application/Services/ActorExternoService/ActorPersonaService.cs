@@ -45,10 +45,16 @@ namespace Vinculacion.Application.Services.ActorExternoService
             var validationActorPersona = await _validator.ValidateAsync(addActorPersonaDto);
             if (!validationActorPersona.IsValid)
             {
-                return OperationResult<AddActorPersonaDto>.Failure("Error: ", validationActorPersona.Errors.Select(x => x.ErrorMessage));
+                var errores = string.Join(
+                    " | ",
+                    validationActorPersona.Errors.Select(e => e.ErrorMessage)
+                );
+
+                return OperationResult<AddActorPersonaDto>
+                    .Failure(errores);
             }
 
-            if(addActorPersonaDto.TipoIdentificacion != 0)
+            if (addActorPersonaDto.TipoIdentificacion != 0)
             { 
                 bool validarIdentificacion = FuncionesService.ValidarIdentificacion(addActorPersonaDto.TipoIdentificacion, addActorPersonaDto.IdentificacionNumero);
 

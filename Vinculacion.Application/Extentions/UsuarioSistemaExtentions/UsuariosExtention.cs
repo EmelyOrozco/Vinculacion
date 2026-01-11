@@ -28,6 +28,7 @@ namespace Vinculacion.Application.Extentions.UsuarioSistemaExtentions
                 Idrol = usuarioDto.Idrol,
                 EstadoId = 1,
                 NombreCompleto = usuarioDto.NombreCompleto,
+                Cedula = usuarioDto.Cedula,
                 CorreoInstitucional = usuarioDto.CorreoInstitucional,
                 FechaRegistro = DateTime.UtcNow
             };

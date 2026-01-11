@@ -28,5 +28,22 @@ namespace Vinculacion.Application.Services
                 })
                 .ToList();
         }
+
+        public async Task<List<TipoVinculacionDto>> GetTiposActividadAsync()
+        {
+            var tipos = await _repository.GetAllAsync();
+
+            return tipos
+                .Where(x => !x.EsProyecto)
+                .Select(x => new TipoVinculacionDto
+                {
+                    TipoVinculacionID = x.TipoVinculacionID,
+                    Descripcion = x.Descripcion,
+                    Detalle = x.Detalle,
+                    EsProyecto = x.EsProyecto
+                })
+                .ToList();
+        }
+
     }
 }

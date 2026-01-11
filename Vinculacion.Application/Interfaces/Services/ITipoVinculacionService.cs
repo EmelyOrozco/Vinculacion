@@ -5,5 +5,6 @@ namespace Vinculacion.Application.Interfaces.Services
     public interface ITipoVinculacionService
     {
         Task<List<TipoVinculacionDto>> GetTiposProyectoAsync();
+        Task<List<TipoVinculacionDto>> GetTiposActividadAsync();
     }
 }

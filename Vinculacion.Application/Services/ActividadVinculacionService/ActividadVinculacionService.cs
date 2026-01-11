@@ -75,12 +75,12 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         }
 
 
-        public async Task<OperationResult<List<ActividadVinculacionDto>>> GetAllAsync()
+        public async Task<OperationResult<List<ResponseActividadVinculacionDto>>> GetAllAsync()
         {
             var result = await _actividadVinculacionRepository.GetAllWithSubtareasAsync();
 
             if (!result.IsSuccess)
-                return OperationResult<List<ActividadVinculacionDto>>
+                return OperationResult<List<ResponseActividadVinculacionDto>>
                     .Failure("Error obteniendo actividades");
 
             var entidades = (List<ActividadVinculacion>)result.Data;
@@ -89,23 +89,23 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 .Select(x => x.ToActividadVinculacionDto())
                 .ToList();
 
-            return OperationResult<List<ActividadVinculacionDto>>
+            return OperationResult<List<ResponseActividadVinculacionDto>>
                 .Success("Actividades obtenidas", data);
         }
 
-        public async Task<OperationResult<ActividadVinculacionDto>> GetByIdAsync(decimal id)
+        public async Task<OperationResult<ResponseActividadVinculacionDto>> GetByIdAsync(decimal id)
         {
             var result = await _actividadVinculacionRepository.GetByIdWithSubtareasAsync(id);
 
             if (!result.IsSuccess || result.Data == null)
-                return OperationResult<ActividadVinculacionDto>
+                return OperationResult<ResponseActividadVinculacionDto>
                     .Failure("Actividad no encontrada");
 
             var entidad = (ActividadVinculacion)result.Data;
 
             var dto = entidad.ToActividadVinculacionDto();
 
-            return OperationResult<ActividadVinculacionDto>
+            return OperationResult<ResponseActividadVinculacionDto>
                 .Success("Actividad encontrada", dto);
         }
 
@@ -187,16 +187,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             if (dto.FechaHoraEvento.HasValue)
                 entity.FechaHoraEvento = dto.FechaHoraEvento;
-
-            if (dto.Subtareas != null)
-            {
-                entity.Subtareas.Clear();
-
-                foreach (var subtareaDto in dto.Subtareas)
-                {
-                    entity.Subtareas.Add(subtareaDto.ToActividadSubtareasFromDto());
-                }
-            }
 
             var subtareasDespues = entity.Subtareas
             .Select(s => new

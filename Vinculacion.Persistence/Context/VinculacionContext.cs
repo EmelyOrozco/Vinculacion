@@ -243,6 +243,7 @@ namespace Vinculacion.Persistence.Context
 
             modelBuilder.Entity<TipoVinculacion>()
                 .HasKey(e => e.TipoVinculacionID);
-        }     
+        }
     }
+}
 
