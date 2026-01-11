@@ -117,6 +117,11 @@ builder.Services.AddHostedService<AlertasBackgroundService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
 
+builder.Services.AddScoped<ICharlaVinculacionRepository, CharlaVinculacionRepository>();
+builder.Services.AddTransient<ICharlaService, CharlaService>();
+
+builder.Services.AddScoped<IPasantiaService, PasantiaService>();
+
 builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

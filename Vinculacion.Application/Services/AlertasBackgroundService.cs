@@ -23,7 +23,7 @@ namespace Vinculacion.Persistence.Repositories
 
                     await alertasRepository.EnviarAlertaAsync();
                 }
-
+                  
                 await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             }
 

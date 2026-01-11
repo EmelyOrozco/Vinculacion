@@ -29,7 +29,7 @@ namespace Vinculacion.API.Controllers
 
             await using var stream = request.Archivo.OpenReadStream();
 
-            await _subidaService.EjecutarSubida(stream, HttpContext.RequestAborted);
+            await _subidaService.EjecutarSubida(request.TipoSubida, request.ContextoId,stream, HttpContext.RequestAborted);
 
             return Ok("Subida ejecutada correctamente.");
         }
