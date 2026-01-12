@@ -111,8 +111,8 @@ builder.Services.AddScoped<IDocumentoAdjuntoRepository, DocumentoAdjuntoReposito
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IDocumentoAdjuntoService, DocumentoAdjuntoService>();
 
-//builder.Services.AddScoped<IAlertasService, AlertasService>();
-//builder.Services.AddHostedService<AlertasBackgroundService>();
+builder.Services.AddScoped<IAlertasService, AlertasService>();
+builder.Services.AddHostedService<AlertasBackgroundService>();
 
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
