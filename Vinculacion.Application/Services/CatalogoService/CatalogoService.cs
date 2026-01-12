@@ -13,19 +13,28 @@ namespace Vinculacion.Application.Services.CatalogoService
         private readonly IFacultadRepository _facultadRepo;
         private readonly IEscuelaRepository _escuelaRepo;
         private readonly ICarreraRepository _carreraRepo;
+        private readonly IRolRepository _rolRepo;
+        private readonly IClasificacionEmpresaRepository _clasificacionEmpresaRepo;
+        private readonly ITipoPersonaVinculacionRepository _tipoPersonaRepo;
 
         public CatalogoService(
         IPaisRepository paisRepo,
         IRecintoRepository recintoRepo,
         IFacultadRepository facultadRepo,
         IEscuelaRepository escuelaRepo,
-        ICarreraRepository carreraRepo)
+        ICarreraRepository carreraRepo,
+        IRolRepository rolRepo,
+        IClasificacionEmpresaRepository clasificacionEmpresaRepository,
+        ITipoPersonaVinculacionRepository tipoPersonaVinculacionRepository)
         {
             _paisRepo = paisRepo;
             _recintoRepo = recintoRepo;
             _facultadRepo = facultadRepo;
             _escuelaRepo = escuelaRepo;
             _carreraRepo = carreraRepo;
+            _rolRepo = rolRepo;
+            _clasificacionEmpresaRepo = clasificacionEmpresaRepository;
+            _tipoPersonaRepo = tipoPersonaVinculacionRepository;
         }
 
         public async Task<IEnumerable<CatalogoDto>> GetPaisesAsync()
@@ -86,6 +95,38 @@ namespace Vinculacion.Application.Services.CatalogoService
                 Descripcion = x.Descripcion
             });
         }
-    }
 
+        public async Task<IEnumerable<CatalogoDto>> GetRolesAsync()
+        {
+            var data = await _rolRepo.GetAllAsync();
+
+            return data.Select(x => new CatalogoDto
+            {
+                Id = x.Idrol,
+                Descripcion = x.Descripcion
+            });
+        }
+
+        public async Task<IEnumerable<CatalogoDto>> GetClasificacionesEmpresaAsync()
+        {
+            var data = await _clasificacionEmpresaRepo.GetAllAsync();
+
+            return data.Select(x => new CatalogoDto
+            {
+                Id = x.ClasificacionID,
+                Descripcion = x.Descripcion
+            });
+        }
+
+        public async Task<IEnumerable<CatalogoDto>> GetTiposPersonaAsync()
+        {
+            var data = await _tipoPersonaRepo.GetAllAsync();
+
+            return data.Select(x => new CatalogoDto
+            {
+                Id = x.TipoPersonaID,
+                Descripcion = x.Descripcion
+            });
+        }
+    }
 }

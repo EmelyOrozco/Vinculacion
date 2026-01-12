@@ -1,46 +1,47 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FluentValidation;
-using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using Vinculacion.API.Extentions;
+using Vinculacion.API.Services;
 using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Dtos.ActorExterno;
 using Vinculacion.Application.Dtos.ActorExternoDtos;
 using Vinculacion.Application.Dtos.ProyectoVinculacionDto;
+using Vinculacion.Application.Dtos.UsuarioSistemaDto;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository;
+using Vinculacion.Application.Interfaces.Repositories.CatalogoRepository;
+using Vinculacion.Application.Interfaces.Repositories.DocumentoAdjuntoRepository;
 using Vinculacion.Application.Interfaces.Repositories.ProyectoVinculacionRepository;
 using Vinculacion.Application.Interfaces.Repositories.UsuariosSistemaRepository;
+using Vinculacion.Application.Interfaces.Services;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IActorExternoService;
+using Vinculacion.Application.Interfaces.Services.ICatalogoService;
+using Vinculacion.Application.Interfaces.Services.IFileStorageService;
 using Vinculacion.Application.Interfaces.Services.IProyectoVinculacionService;
 using Vinculacion.Application.Interfaces.Services.IUsuarioSistemaService;
 using Vinculacion.Application.Services;
 using Vinculacion.Application.Services.ActividadVinculacionService;
 using Vinculacion.Application.Services.ActorExternoService;
+using Vinculacion.Application.Services.CatalogoService;
+using Vinculacion.Application.Services.DocumentoAdjuntoService;
 using Vinculacion.Application.Services.UsuariosSistemaService;
 using Vinculacion.Application.Validators.ActividadVinculacionValidator;
 using Vinculacion.Application.Validators.ActorExternoValidator;
 using Vinculacion.Application.Validators.ProyectoVinculacionValidator;
+using Vinculacion.Application.Validators.UsuariosSistemaValidator;
 using Vinculacion.Domain.Entities;
 using Vinculacion.Persistence;
 using Vinculacion.Persistence.Context;
 using Vinculacion.Persistence.Repositories;
-using Vinculacion.Application.Validators.UsuariosSistemaValidator;
-using Vinculacion.Application.Dtos.UsuarioSistemaDto;
-using Vinculacion.Application.Interfaces.Repositories.CatalogoRepository;
-using Vinculacion.Application.Interfaces.Services.ICatalogoService;
-using Vinculacion.Application.Services.CatalogoService;
-using Vinculacion.Application.Interfaces.Repositories.DocumentoAdjuntoRepository;
-using Vinculacion.Application.Interfaces.Services.IFileStorageService;
-using Vinculacion.API.Services;
-using Vinculacion.Application.Services.DocumentoAdjuntoService;
-using Vinculacion.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,6 +126,10 @@ builder.Services.AddTransient<IPasantiaService, PasantiaService>();
 builder.Services.AddScoped<IPasantiaVinculacionRepository, PasantiaVinculacionRepository>();
 builder.Services.AddScoped<ITipoVinculacionRepository, TipoVinculacionRepository>();
 builder.Services.AddScoped<ITipoVinculacionService, TipoVinculacionService>();
+
+builder.Services.AddScoped<IRolRepository, RolRepository>();
+builder.Services.AddScoped<IClasificacionEmpresaRepository, ClasificacionEmpresaRepository>();
+builder.Services.AddScoped<ITipoPersonaVinculacionRepository, TipoPersonaVinculacionRepository>();
 
 builder.Services.AddAuthentication(options =>
         {

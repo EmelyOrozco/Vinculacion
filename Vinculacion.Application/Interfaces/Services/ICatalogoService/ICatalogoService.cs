@@ -9,6 +9,9 @@ namespace Vinculacion.Application.Interfaces.Services.ICatalogoService
         Task<IEnumerable<CatalogoDto>> GetFacultadesAsync();
         Task<IEnumerable<CatalogoDto>> GetEscuelasByFacultadAsync(decimal facultadId);
         Task<IEnumerable<CatalogoDto>> GetCarrerasByEscuelaAsync(decimal escuelaId);
+        Task<IEnumerable<CatalogoDto>> GetRolesAsync();
+        Task<IEnumerable<CatalogoDto>> GetClasificacionesEmpresaAsync();
+        Task<IEnumerable<CatalogoDto>> GetTiposPersonaAsync();
     }
 
 }

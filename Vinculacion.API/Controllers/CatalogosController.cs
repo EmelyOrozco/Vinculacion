@@ -43,6 +43,24 @@ namespace Vinculacion.API.Controllers
         {
             return Ok(await _catalogoService.GetCarrerasByEscuelaAsync(escuelaId));
         }
+
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            return Ok(await _catalogoService.GetRolesAsync());
+        }
+
+        [HttpGet("clasificaciones-empresa")]
+        public async Task<IActionResult> GetClasificacionesEmpresa()
+        {
+            return Ok(await _catalogoService.GetClasificacionesEmpresaAsync());
+        }
+
+        [HttpGet("tipos-persona")]
+        public async Task<IActionResult> GetTiposPersona()
+        {
+            return Ok(await _catalogoService.GetTiposPersonaAsync());
+        }
     }
 
 }
