@@ -14,6 +14,21 @@ namespace Vinculacion.Persistence.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Escuela>> GetAllAsync()
+        {
+            return await _context.Escuelas
+                .AsNoTracking()
+                .OrderBy(x => x.Descripcion)
+                .ToListAsync();
+        }
+
+        public async Task<Escuela?> GetByIdAsync(decimal escuelaId)
+        {
+            return await _context.Escuelas
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.EscuelaID == escuelaId);
+        }
+
         public async Task<IEnumerable<Escuela>> GetByFacultadAsync(decimal facultadId)
         {
             return await _context.Escuelas

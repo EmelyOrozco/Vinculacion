@@ -15,6 +15,7 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
                 TelefonoContacto = personaVinculacionDto.TelefonoContacto,
                 Matricula = personaVinculacionDto.Matricula,
                 RecintoID = personaVinculacionDto.RecintoID,
+                FacultadID = personaVinculacionDto.FacultadID,
                 EscuelaID = personaVinculacionDto.EscuelaID,
                 CarreraID = personaVinculacionDto.CarreraID,
                 TipoRelacion = personaVinculacionDto.TipoRelacion,

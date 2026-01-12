@@ -11,6 +11,7 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
             {
                 TipoPersonaID = entity.TipoPersonaID,
                 RecintoID = entity.RecintoID,
+                FacultadID = entity.FacultadID,
                 EscuelaID = entity.EscuelaID,
                 CarreraID = entity.CarreraID,
                 NombreCompleto = entity.NombreCompleto,

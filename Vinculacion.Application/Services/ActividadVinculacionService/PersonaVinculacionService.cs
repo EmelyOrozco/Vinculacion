@@ -4,6 +4,7 @@ using Vinculacion.Application.Dtos.ActividadVinculacionDtos.PersonaVinculacion;
 using Vinculacion.Application.Extentions.ActividadVinculacionExtentions;
 using Vinculacion.Application.Interfaces.Repositories;
 using Vinculacion.Application.Interfaces.Repositories.ActividadVinculacionRepository;
+using Vinculacion.Application.Interfaces.Repositories.CatalogoRepository;
 using Vinculacion.Application.Interfaces.Services.IActividadVinculacionService;
 using Vinculacion.Domain.Base;
 using Vinculacion.Domain.Entities;
@@ -15,13 +16,24 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
         private readonly IPersonaVinculacionRepository _personaVinculacionRepository;
         private readonly IValidator<PersonaVinculacionDto> _validator;
         private readonly IUnitOfWork _unitOfWork;
-        public PersonaVinculacionService(IPersonaVinculacionRepository personaVinculacionRepository,
+        private readonly IFacultadRepository _facultadRepository;
+        private readonly IEscuelaRepository _escuelaRepository;
+        private readonly ICarreraRepository _carreraRepository;
+
+        public PersonaVinculacionService(
+            IPersonaVinculacionRepository personaVinculacionRepository,
             IValidator<PersonaVinculacionDto> validator,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IFacultadRepository facultadRepository,
+            IEscuelaRepository escuelaRepository,
+            ICarreraRepository carreraRepository)
         {
             _personaVinculacionRepository = personaVinculacionRepository;
             _validator = validator;
             _unitOfWork = unitOfWork;
+            _facultadRepository = facultadRepository;
+            _escuelaRepository = escuelaRepository;
+            _carreraRepository = carreraRepository;
         }
 
         public async Task<OperationResult<PersonaVinculacionDto>> AddPersonaVinculacion(PersonaVinculacionDto personaVinculacionDto, decimal usuarioId)
@@ -34,6 +46,47 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             {
                 return OperationResult<PersonaVinculacionDto>.Failure("Error: ", result.Errors.Select(x => x.ErrorMessage));
             }
+
+            if (personaVinculacionDto.FacultadID.HasValue)
+            {
+                var facultad = await _facultadRepository.GetByIdAsync(personaVinculacionDto.FacultadID.Value);
+                if (facultad == null)
+                    return OperationResult<PersonaVinculacionDto>
+                        .Failure("La facultad seleccionada no existe");
+            }
+
+            if (personaVinculacionDto.EscuelaID.HasValue)
+            {
+                var escuela = await _escuelaRepository.GetByIdAsync(personaVinculacionDto.EscuelaID.Value);
+
+                if (escuela == null)
+                    return OperationResult<PersonaVinculacionDto>
+                        .Failure("La escuela seleccionada no existe");
+
+                if (personaVinculacionDto.FacultadID.HasValue &&
+                    escuela.FacultadID != personaVinculacionDto.FacultadID.Value)
+                {
+                    return OperationResult<PersonaVinculacionDto>
+                        .Failure("La escuela no pertenece a la facultad seleccionada");
+                }
+            }
+
+            if (personaVinculacionDto.CarreraID.HasValue)
+            {
+                var carrera = await _carreraRepository.GetByIdAsync(personaVinculacionDto.CarreraID.Value);
+
+                if (carrera == null)
+                    return OperationResult<PersonaVinculacionDto>
+                        .Failure("La carrera seleccionada no existe");
+
+                if (personaVinculacionDto.EscuelaID.HasValue &&
+                    carrera.EscuelaID != personaVinculacionDto.EscuelaID.Value)
+                {
+                    return OperationResult<PersonaVinculacionDto>
+                        .Failure("La carrera no pertenece a la escuela seleccionada");
+                }
+            }
+
 
             var guardar = await _personaVinculacionRepository.AddAsync(personaVinculacion);
             await _unitOfWork.Auditoria.RegistrarAsync(new Auditoria
@@ -91,10 +144,52 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             var entity = entityResult.Data;
 
+            decimal? facultadIdFinal = dto.FacultadID ?? entity.FacultadID;
+            decimal? escuelaIdFinal = dto.EscuelaID ?? entity.EscuelaID;
+            decimal? carreraIdFinal = dto.CarreraID ?? entity.CarreraID;
+
+            if (facultadIdFinal.HasValue)
+            {
+                var facultad = await _facultadRepository.GetByIdAsync(facultadIdFinal.Value);
+                if (facultad == null)
+                    return OperationResult<bool>.Failure("La facultad seleccionada no existe");
+            }
+
+            if (escuelaIdFinal.HasValue)
+            {
+                var escuela = await _escuelaRepository.GetByIdAsync(escuelaIdFinal.Value);
+                if (escuela == null)
+                    return OperationResult<bool>.Failure("La escuela seleccionada no existe");
+
+                if (facultadIdFinal.HasValue &&
+                    escuela.FacultadID != facultadIdFinal.Value)
+                {
+                    return OperationResult<bool>.Failure(
+                        "La escuela no pertenece a la facultad seleccionada. Debe cambiar la escuela y la carrera."
+                    );
+                }
+            }
+
+            if (carreraIdFinal.HasValue)
+            {
+                var carrera = await _carreraRepository.GetByIdAsync(carreraIdFinal.Value);
+                if (carrera == null)
+                    return OperationResult<bool>.Failure("La carrera seleccionada no existe");
+
+                if (escuelaIdFinal.HasValue &&
+                    carrera.EscuelaID != escuelaIdFinal.Value)
+                {
+                    return OperationResult<bool>.Failure(
+                        "La carrera no pertenece a la escuela seleccionada. Debe cambiar la carrera."
+                    );
+                }
+            }
+
             var antes = JsonSerializer.Serialize(new
             {
                 entity.TipoPersonaID,
                 entity.RecintoID,
+                entity.FacultadID,
                 entity.EscuelaID,
                 entity.CarreraID,
                 entity.NombreCompleto,
@@ -113,6 +208,9 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             if (dto.RecintoID.HasValue && dto.RecintoID > 0)
                 entity.RecintoID = dto.RecintoID.Value;
+
+            if (dto.FacultadID.HasValue && dto.FacultadID > 0)
+                entity.FacultadID = dto.FacultadID.Value;
 
             if (dto.EscuelaID.HasValue && dto.EscuelaID > 0)
                 entity.EscuelaID = dto.EscuelaID.Value;
@@ -148,6 +246,7 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
             {
                 entity.TipoPersonaID,
                 entity.RecintoID,
+                entity.FacultadID,
                 entity.EscuelaID,
                 entity.CarreraID,
                 entity.NombreCompleto,
@@ -176,6 +275,5 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
 
             return OperationResult<bool>.Success("Persona vinculada actualizada correctamente", true);
         }
-
     }
 }

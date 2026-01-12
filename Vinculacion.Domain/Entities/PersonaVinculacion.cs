@@ -10,6 +10,8 @@ namespace Vinculacion.Domain.Entities
 
         public decimal? RecintoID { get; set; }
 
+        public decimal? FacultadID { get; set; }
+
         public decimal? EscuelaID { get; set; }
 
         public decimal? CarreraID { get; set; }
