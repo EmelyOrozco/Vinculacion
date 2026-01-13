@@ -17,7 +17,7 @@ namespace Vinculacion.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAuditoria()
         {
             var data = await _unitOfWork.Auditoria.GetAllAsync();
             return Ok(data);

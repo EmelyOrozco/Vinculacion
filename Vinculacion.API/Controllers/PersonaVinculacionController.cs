@@ -30,7 +30,7 @@ namespace Vinculacion.API.Controllers
 
         [Authorize(Roles = "Superusuario, Usuario Consultor")]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetPersonaVinculacion()
         {
             var result = await _personaVinculacionService.GetAllAsync();
 
@@ -42,7 +42,7 @@ namespace Vinculacion.API.Controllers
 
         [Authorize(Roles = "Superusuario, Usuario Consultor")]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(decimal id)
+        public async Task<IActionResult> GetPersonaVinculacionById(decimal id)
         {
             var result = await _personaVinculacionService.GetByIdAsync(id);
 
@@ -54,7 +54,7 @@ namespace Vinculacion.API.Controllers
 
         [Authorize(Roles = "Superusuario, Usuario Final")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(decimal id, [FromBody] PersonaVinculacionUpdateDto dto)
+        public async Task<IActionResult> UpdatePersonaVinculacion(decimal id, [FromBody] PersonaVinculacionUpdateDto dto)
         {
             var usuarioId = UsuarioId;
             var result = await _personaVinculacionService.UpdateAsync(id, dto, usuarioId);
