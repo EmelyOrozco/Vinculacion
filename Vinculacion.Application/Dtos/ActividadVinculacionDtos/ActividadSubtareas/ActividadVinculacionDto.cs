@@ -22,7 +22,5 @@ namespace Vinculacion.Application.Dtos.ActividadVinculacionDtos.ActividadSubtare
         public DateTime? FechaHoraEvento { get; set; }
 
         public DateTime FechaRegistro { get; set; }
-
-        public List<ActividadSubtareaDto>? Subtareas { get; set; } 
     }
 }

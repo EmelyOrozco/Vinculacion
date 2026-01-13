@@ -342,9 +342,6 @@ namespace Vinculacion.Application.Services.ActividadVinculacionService
                 actividad.FechaHoraEvento.Value <= DateTime.UtcNow)
                 return EstadosActividad.Finalizado;
 
-            if (!ActividadEstaCompleta(actividad))
-                return EstadosActividad.Parcial;
-
             return EstadosActividad.Activo;
         }
 

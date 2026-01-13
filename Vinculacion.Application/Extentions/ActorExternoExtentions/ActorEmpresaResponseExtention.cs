@@ -11,10 +11,10 @@ namespace Vinculacion.Application.Extentions.ActorExternoExtentions
             {
                 ActorExternoID = entity.ActorExternoID,
                 EstadoID = entity.ActorExterno.EstadoID,
-                FechaRegistro = entity.ActorExterno.FechaRegistro,
                 NombreEmpresa = entity.NombreEmpresa,
-                TipoIdentificacion = entity.TipoIdentificacion,
-                IdentificacionNumero = entity.IdentificacionNumero,
+                ContactoNombrePersona = entity.ContactoNombrePersona,
+                ContactoCorreo = entity.ContactoCorreo,
+                ContactoTelefono = entity.ContactoTelefono,
                 PaisID = entity.PaisID,
                 Clasificaciones = entity.ActorEmpresaClasificaciones
                     .Select(c => c.ClasificacionID)

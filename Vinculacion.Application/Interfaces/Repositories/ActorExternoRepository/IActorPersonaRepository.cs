@@ -6,5 +6,6 @@ namespace Vinculacion.Application.Interfaces.Repositories.ActorExternoRepository
     {
         Task<ActorPersona?> GetByIdWithActorExternoAsync(decimal id);
         Task<bool> ActorPersonaExists(string? Identificacion);
+        Task<List<ActorPersona>> GetAllWithActorExternoAsync();
     }
 }

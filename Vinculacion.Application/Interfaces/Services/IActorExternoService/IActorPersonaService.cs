@@ -7,8 +7,8 @@ namespace Vinculacion.Application.Interfaces.Services.IActorExternoService
     public interface IActorPersonaService 
     {
         Task<OperationResult<AddActorPersonaDto>> AddActorPersonaAsync(AddActorPersonaDto addActorPersonaDto, decimal usuarioId);
-        Task<OperationResult<List<AddActorPersonaDto>>> GetActorPersonaAsync();
-        Task<OperationResult<AddActorPersonaDto>> GetActorPersonaById(decimal id);
+        Task<OperationResult<List<ActorPersonaResponseDto>>> GetActorPersonaAsync();
+        Task<OperationResult<ActorPersonaResponseDto>> GetActorPersonaById(decimal id);
         Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id,UpdateActorPersonaDto dto, decimal usuarioId);
     }
 }

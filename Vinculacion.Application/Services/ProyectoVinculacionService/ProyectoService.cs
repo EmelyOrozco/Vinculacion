@@ -365,19 +365,6 @@ namespace Vinculacion.Application.Services
                 .Success("Actividades del proyecto obtenidas", response);
         }
 
-        public async Task<OperationResult<List<ActividadVinculacionDto>>> GetActividadesDisponiblesAsync()
-        {
-            var actividades = await _actividadRepository.GetActividadesDisponibles();
-
-            var response = actividades.Select(a => a.ToActividadVinculacionDto()).ToList();
-
-            if (!actividades.Any())
-            {
-                return OperationResult<List<ActividadVinculacionDto>>.Success("No hay actividades disponibles para asociar a proyectos", actividades);
-            }
-            return OperationResult<List<ActividadVinculacionDto>>.Success("Actividades disponibles obtenidas", actividades);
-        }
-
         public async Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesDisponiblesByProyectoAsync(decimal proyectoId)
         {
             var proyectoResult = await _proyectoRepository.GetByIdAsync(proyectoId);

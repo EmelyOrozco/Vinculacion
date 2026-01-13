@@ -24,5 +24,12 @@ namespace Vinculacion.Persistence.Repositories
                 .Include(p => p.ActorExterno)
                 .FirstOrDefaultAsync(p => p.ActorExternoID == id);
         }
+        public async Task<List<ActorPersona>> GetAllWithActorExternoAsync()
+        {
+            return await _context.ActorPersona
+                .Include(p => p.ActorExterno)
+                .ToListAsync();
+        }
+
     }
 }

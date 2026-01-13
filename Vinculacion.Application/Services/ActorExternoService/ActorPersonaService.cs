@@ -95,26 +95,34 @@ namespace Vinculacion.Application.Services.ActorExternoService
             return OperationResult<AddActorPersonaDto>.Success("Persona Vinculante añadida correctamente", addActorPersonaDto);
         }
 
-        public async Task<OperationResult<List<AddActorPersonaDto>>> GetActorPersonaAsync()
+        public async Task<OperationResult<List<ActorPersonaResponseDto>>> GetActorPersonaAsync()
         {
-            var actorPersona = await _actorPersonaRepository.GetAllAsync(l => true);
-            if (!actorPersona.IsSuccess)
-            {
-                return OperationResult<List<AddActorPersonaDto>>.Failure($"Error obteniendo las personas vinculadas {actorPersona.Message}");
-            }
+            var personas = await _actorPersonaRepository.GetAllWithActorExternoAsync();
 
-            return OperationResult<List<AddActorPersonaDto>>.Success("Personas vinculadas: ", actorPersona.Data);
+            var response = personas
+                .Select(p => p.ToActorPersonaFromActorPersonaDto())
+                .ToList();
+
+            return OperationResult<List<ActorPersonaResponseDto>>
+                .Success("Personas vinculadas", response);
         }
 
-        public async Task<OperationResult<AddActorPersonaDto>> GetActorPersonaById(decimal id)
+
+        public async Task<OperationResult<ActorPersonaResponseDto>> GetActorPersonaById(decimal id)
         {
-            var actorPersona = await _actorPersonaRepository.GetByIdAsync(id);
-            if (!actorPersona.IsSuccess)
+            var actorPersona = await _actorPersonaRepository.GetByIdWithActorExternoAsync(id);
+
+            if (actorPersona == null)
             {
-                return OperationResult<AddActorPersonaDto>.Failure($"Error la persona vinculada no existe {actorPersona.Message}");
+                return OperationResult<ActorPersonaResponseDto>
+                    .Failure("La persona vinculada no existe");
             }
 
-            return OperationResult<AddActorPersonaDto>.Success("Persona vinculada: ", actorPersona.Data);
+            return OperationResult<ActorPersonaResponseDto>
+                .Success(
+                    "Persona vinculada",
+                    actorPersona.ToActorPersonaFromActorPersonaDto()
+                );
         }
 
         public async Task<OperationResult<bool>> UpdateActorPersonaAsync(decimal id, UpdateActorPersonaDto dto, decimal usuarioId)

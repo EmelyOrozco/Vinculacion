@@ -18,10 +18,7 @@ namespace Vinculacion.Application.Extentions.ActividadVinculacionExtentions
                 Modalidad = actividadVinculacionDto.Modalidad,
                 Lugar = actividadVinculacionDto.Lugar,
                 FechaHoraEvento = actividadVinculacionDto.FechaHoraEvento,
-                FechaRegistro = actividadVinculacionDto.FechaRegistro,
-                Subtareas = actividadVinculacionDto.Subtareas?
-                .Select(st => st.ToActividadSubtareasFromDto())
-                .ToList() ?? new List<ActividadSubtareas>()
+                FechaRegistro = actividadVinculacionDto.FechaRegistro
             };
         }
     }

@@ -13,7 +13,6 @@ namespace Vinculacion.Application.Interfaces.Services.IProyectoVinculacionServic
         Task<OperationResult<bool>> AddActividadToProyectoAsync(decimal proyectoId, decimal actividadId, decimal usuarioId);
         Task<OperationResult<bool>> AddActividadesToProyectoAsync(decimal proyectoId,AddActividadesToProyectoDto dto, decimal usuarioId);
         Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesByProyectoAsync(decimal proyectoId);
-        Task<OperationResult<List<ActividadVinculacionDto>>> GetActividadesDisponiblesAsync();
         Task<OperationResult<List<ActividadVinculacionDto>>>GetActividadesDisponiblesByProyectoAsync(decimal proyectoId);
 
         Task ProcesarProyectosAsync(DateTime hoy);
